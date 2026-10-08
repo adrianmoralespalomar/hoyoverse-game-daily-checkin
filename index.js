@@ -8,7 +8,7 @@
  * Uso:  node --env-file=.env index.js
  */
 
-import { appendFile, mkdir } from 'node:fs/promises';
+import { appendFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -69,6 +69,27 @@ async function log(level, msg) {
     } catch {
       /* el log a fichero es opcional, no debe tumbar el check-in */
     }
+  }
+}
+
+const DEFAULT_LOG_RETENTION_DAYS = 7;
+const MS_PER_DAY = 86_400_000;
+
+/**
+ * Borra del LOG_FILE las líneas con más de LOG_RETENTION_DAYS días (por defecto 7).
+ * Las líneas sin fecha ISO al principio se conservan. Exportada para poder testearla.
+ */
+export async function pruneOldLogLines(file, retentionDays = DEFAULT_LOG_RETENTION_DAYS, now = Date.now()) {
+  try {
+    const cutoff = now - retentionDays * MS_PER_DAY;
+    const lines = (await readFile(file, 'utf8')).split('\n');
+    const kept = lines.filter((line) => {
+      const timestamp = Date.parse(line.match(/^\[([^\]]+)\]/)?.[1]);
+      return Number.isNaN(timestamp) || timestamp >= cutoff;
+    });
+    if (kept.length < lines.length) await writeFile(file, kept.join('\n'));
+  } catch {
+    /* sin fichero todavía o sin permisos: el log a fichero es opcional */
   }
 }
 
@@ -160,6 +181,11 @@ export function readConfig(env = process.env) {
 async function notify(_results) {}
 
 export async function main() {
+  if (process.env.LOG_FILE) {
+    const retentionDays = Number(process.env.LOG_RETENTION_DAYS || DEFAULT_LOG_RETENTION_DAYS);
+    await pruneOldLogLines(process.env.LOG_FILE, retentionDays);
+  }
+
   let config;
   try {
     config = readConfig();
