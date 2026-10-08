@@ -1,0 +1,8 @@
+services:
+  hoyolab-checkin:
+    build: .
+    container_name: hoyolab-checkin
+    restart: unless-stopped
+    volumes:
+      - ./.env:/app/.env:ro
+      - ./logs:/app/logs

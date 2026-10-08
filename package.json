@@ -1,0 +1,15 @@
+{
+  "name": "hoyolab-checkin",
+  "version": "1.0.0",
+  "description": "Check-in diario de HoYoLAB para Genshin Impact, Honkai: Star Rail y Zenless Zone Zero",
+  "type": "module",
+  "main": "index.js",
+  "engines": {
+    "node": ">=20.6"
+  },
+  "scripts": {
+    "start": "node --env-file=.env index.js",
+    "test": "node --test test.js"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,4 @@
+# Todos los días a las 19:00 (hora de Madrid). El día de HoYoLAB cambia a las
+# 18:00 en verano y a las 17:00 en invierno, así que 19:00 vale todo el año.
+# START_JITTER_SECONDS añade unos minutos aleatorios.
+0 19 * * * cd /app && node --env-file=/app/.env index.js >> /proc/1/fd/1 2>&1
