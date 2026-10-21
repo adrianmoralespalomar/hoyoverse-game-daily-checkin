@@ -1,0 +1,45 @@
+form.acceso {
+  display: grid;
+  gap: 1.25rem;
+  margin: 18vh auto 0;
+  max-width: 24rem;
+  padding: 0 1rem;
+
+  h1 {
+    font-size: 3.5rem;
+    font-variation-settings: 'opsz' 96, 'wdth' 78;
+  }
+
+  label.campo {
+    display: grid;
+    font-weight: 600;
+    gap: 0.4rem;
+
+    input {
+      background: var(--superficie);
+      border: 1px solid var(--linea);
+      border-radius: var(--radio-pequeno);
+      color: var(--tinta);
+      font: inherit;
+      padding: 0.7rem 0.9rem;
+    }
+  }
+
+  span.error,
+  span.olvido {
+    display: block;
+    font-size: 0.9rem;
+  }
+
+  span.error {
+    color: var(--error);
+  }
+
+  span.olvido {
+    color: var(--apagado);
+  }
+
+  button.boton {
+    justify-self: start;
+  }
+}

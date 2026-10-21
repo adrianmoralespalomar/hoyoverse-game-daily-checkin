@@ -1,0 +1,97 @@
+<section
+  class="capitulo"
+  [style.--acento]="theme().accent">
+  <header class="capitulo-cabecera">
+    <h2>{{ game().name }}</h2>
+    @if (summary(); as summary) {
+      <span class="capitulo-racha">
+        {{ summary.totalSignDays }} de {{ summary.monthRewards.length }} días sellados este mes
+      </span>
+    }
+    @if (checkInProblem(); as checkInProblem) {
+      <span
+        class="capitulo-problema"
+        role="alert">
+        {{ checkInProblem }}.
+        <a
+          [href]="theme().checkInUrl"
+          target="_blank"
+          rel="noopener">Hacerlo en HoYoLAB</a>
+      </span>
+    }
+  </header>
+
+  @if (game().notes; as notesState) {
+    <app-energy-panel [notesState]="notesState"/>
+  }
+
+  @if (calendarDays().length) {
+    <ol
+      class="calendario"
+      aria-label="Recompensas de cada día del mes">
+      @for (day of calendarDays(); track $index) {
+        <li
+          class="dia"
+          [class.reclamado]="day.isClaimed"
+          [class.hoy]="day.isToday"
+          [style.--orden]="$index">
+          <span class="dia-numero">{{ $index + 1 }}</span>
+          <img
+            [src]="day.reward.iconUrl"
+            [alt]="day.reward.name"
+            loading="lazy"
+            width="48"
+            height="48"/>
+          <span class="dia-cantidad">×{{ day.reward.count }}</span>
+        </li>
+      }
+    </ol>
+  } @else if (game().checkIn) {
+    <span class="vacio">
+      El calendario del mes aparecerá tras el primer check-in (a las {{ checkInTimeLabel() }}).
+    </span>
+  }
+
+  @if (game().codes; as codesState) {
+    <div class="codigos">
+      <h3>Códigos</h3>
+      <span class="codigos-estado">
+        @if (!codesState.isRedeemEnabled) {
+          No se canjean: {{ codesState.redeemDisabledReason }}.
+        } @else if (codesState.fetchError) {
+          No se pudo consultar la lista: {{ codesState.fetchError }}.
+        } @else if (codesState.lastFetchedAt) {
+          Se buscan y canjean solos cada hora. Última búsqueda a las {{ codesState.lastFetchedAt | date: 'HH:mm' }}.
+        } @else {
+          Se buscan y canjean solos cada hora.
+        }
+      </span>
+
+      @if (codes().length) {
+        <ul class="codigos-lista">
+          @for (code of codes(); track code.code) {
+            <li
+              class="codigo"
+              [class.inactivo]="!code.isActive"
+              [attr.title]="code.message">
+              <code>{{ code.code }}</code>
+              <span class="codigo-premios">{{ code.rewards || 'Recompensa sin detallar' }}</span>
+              <span
+                class="codigo-estado"
+                [attr.data-estado]="code.status">{{ codeStatusLabels[code.status] }}</span>
+              @if (code.status === 'manual' || code.status === 'failed') {
+                <a
+                  class="codigo-enlace"
+                  [href]="theme().redeemUrl"
+                  target="_blank"
+                  rel="noopener">Abrir la web de canje</a>
+              }
+            </li>
+          }
+        </ul>
+      } @else {
+        <span class="vacio">No hay códigos activos ahora mismo.</span>
+      }
+    </div>
+  }
+</section>

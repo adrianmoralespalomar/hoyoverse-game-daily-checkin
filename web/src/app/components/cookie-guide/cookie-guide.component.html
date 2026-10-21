@@ -1,0 +1,43 @@
+<details
+  class="guia"
+  [open]="isOpen()">
+  <summary>Cómo renovar una cookie</summary>
+
+  <span class="guia-intro">
+    Las cookies caducan si cierras sesión en HoYoLAB o en HoYoverse, o pasadas unas semanas. Inicia sesión en un
+    navegador, saca la nueva y pégala en el NAS. Cerrar la pestaña no pasa nada; cerrar sesión, sí.
+  </span>
+
+  <div class="guia-columnas">
+    @for (guide of cookieGuides; track guide.title) {
+      <article class="guia-cookie">
+        <h3>{{ guide.title }}</h3>
+        <ol>
+          <li>
+            Abre
+            <a
+              [href]="guide.siteUrl"
+              target="_blank"
+              rel="noopener">{{ guide.siteUrl }}</a>
+            con la sesión iniciada.
+          </li>
+          <li>Pulsa <kbd>F12</kbd> → pestaña <strong>Application</strong> → <strong>Cookies</strong> → <code>{{ guide.cookieDomain }}</code>.</li>
+          <li>
+            Copia el <strong>Value</strong> entero de
+            @for (cookieName of guide.cookieNames; track cookieName; let isLast = $last) {
+              <code>{{ cookieName }}</code>{{ isLast ? '.' : ', ' }}
+            }
+            Si una sale dos veces, la del dominio <code>{{ guide.cookieDomain }}</code>.
+          </li>
+          <li>Ponlas en una línea del <code>.env</code>, separadas por punto y coma: <code class="guia-linea">{{ guide.envLine }}</code></li>
+        </ol>
+      </article>
+    }
+  </div>
+
+  <span class="guia-final">
+    Edita <code>{{ nasEnvFilePath }}</code> y reinicia el proyecto en UGOS (Docker → Proyectos → hoyo-games → ⋯ →
+    Reiniciar). La cookie vuelve a "Sin probar todavía" y se usa en la siguiente ronda; para no esperar, pulsa los
+    botones de arriba. No uses la consola (<code>document.cookie</code>): estas cookies no salen ahí.
+  </span>
+</details>

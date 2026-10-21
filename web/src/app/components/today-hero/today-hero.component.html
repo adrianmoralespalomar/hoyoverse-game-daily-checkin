@@ -1,0 +1,37 @@
+<section class="hoy">
+  <span class="dia">{{ dayLabel() }}</span>
+  <h1>{{ headline() }}</h1>
+
+  <div class="sellos">
+    @for (stamp of stamps(); track stamp.gameId) {
+      <a
+        class="sello"
+        [href]="'#' + stamp.gameId"
+        [class.hecho]="stamp.isDone"
+        [class.te-necesita]="stamp.needsYou"
+        [style.--acento]="stamp.accent"
+        [style.--orden]="$index">
+        <span class="sello-juego">{{ stamp.shortName }}</span>
+        @if (stamp.reward) {
+          <img
+            [src]="stamp.reward.iconUrl"
+            [alt]="stamp.reward.name"
+            width="96"
+            height="96"/>
+          <span class="sello-premio">{{ stamp.reward.name }} ×{{ stamp.reward.count }}</span>
+        } @else {
+          <span class="sello-premio sin-datos">Calendario aún sin leer</span>
+        }
+        <span class="sello-estado">{{ stamp.statusText }}</span>
+        @if (stamp.energyText) {
+          <span class="sello-energia">{{ stamp.energyText }}</span>
+        }
+        @if (stamp.isDone) {
+          <span
+            class="sello-marca"
+            aria-hidden="true">Hecho</span>
+        }
+      </a>
+    }
+  </div>
+</section>

@@ -1,0 +1,22 @@
+{
+  "name": "hoyo-games-server",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Daemon de Hoyo Games: check-in de HoYoLAB, canje automático de códigos y API del panel",
+  "type": "module",
+  "scripts": {
+    "start": "node src/daemon.ts",
+    "dev": "node --watch src/daemon.ts",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fastify/static": "^10.1.6",
+    "fastify": "^5.12.5",
+    "node-cron": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^7.0.2"
+  }
+}

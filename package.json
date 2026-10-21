@@ -1,15 +1,19 @@
 {
-  "name": "hoyolab-checkin",
-  "version": "1.0.0",
-  "description": "Check-in diario de HoYoLAB para Genshin Impact, Honkai: Star Rail y Zenless Zone Zero",
+  "name": "hoyo-games",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Check-in diario de HoYoLAB y canje automático de códigos (Genshin, Star Rail, Zenless), con panel web en el NAS",
   "type": "module",
-  "main": "index.js",
   "engines": {
-    "node": ">=20.6"
+    "node": ">=24"
   },
   "scripts": {
-    "start": "node --env-file=.env index.js",
-    "test": "node --test test.js"
+    "install:all": "npm install --prefix server && npm install --prefix web",
+    "start": "npm start --prefix server",
+    "deploy": "node scripts/deploy-nas.ts",
+    "typecheck": "npm run typecheck --prefix server",
+    "test": "npm test --prefix server",
+    "build:web": "npm run build --prefix web"
   },
   "license": "MIT"
 }

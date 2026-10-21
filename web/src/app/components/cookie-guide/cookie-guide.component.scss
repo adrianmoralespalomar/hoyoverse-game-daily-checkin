@@ -1,0 +1,62 @@
+details.guia {
+  background: var(--superficie);
+  border-radius: var(--radio-grande);
+  padding: 1.25rem 1.5rem;
+
+  summary {
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  span.guia-intro,
+  span.guia-final {
+    color: var(--apagado);
+    display: block;
+    margin-top: 1rem;
+    max-width: 70ch;
+  }
+
+  .guia-columnas {
+    display: grid;
+    gap: 1.5rem 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    margin-top: 1.5rem;
+  }
+
+  article.guia-cookie {
+    h3 {
+      font-size: 1.35rem;
+      font-variation-settings: 'opsz' 72, 'wdth' 85;
+    }
+
+    ol {
+      display: grid;
+      gap: 0.6rem;
+      margin: 0.9rem 0 0;
+      padding-left: 1.3rem;
+    }
+
+    a {
+      color: var(--tinta);
+      overflow-wrap: anywhere;
+    }
+
+    code.guia-linea {
+      background: var(--fondo);
+      border-radius: var(--radio-pequeno);
+      display: block;
+      margin-top: 0.4rem;
+      overflow-wrap: anywhere;
+      padding: 0.5rem 0.7rem;
+    }
+  }
+
+  kbd {
+    border: 1px solid var(--linea);
+    border-radius: 4px;
+    font: inherit;
+    font-size: 0.85em;
+    padding: 0 0.3rem;
+  }
+}

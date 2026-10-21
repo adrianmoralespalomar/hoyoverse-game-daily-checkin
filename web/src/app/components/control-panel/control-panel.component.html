@@ -1,0 +1,81 @@
+<section class="control">
+  <h2>Control</h2>
+
+  @if (dashboard().problems.length) {
+    <ul
+      class="problemas"
+      role="alert">
+      @for (problem of dashboard().problems; track problem) {
+        <li>{{ problem }}</li>
+      }
+    </ul>
+  }
+
+  <form
+    class="horario"
+    (submit)="$event.preventDefault(); onCheckInTimeFormSubmitted()">
+    <label>
+      <span class="horario-titulo">Hora del check-in diario</span>
+      <input
+        type="time"
+        required
+        [value]="checkInTimeDraft()"
+        (input)="onCheckInTimeChanged($event)"/>
+    </label>
+    <button
+      type="submit"
+      class="boton secundario"
+      [disabled]="!checkInTimeDraft() || checkInTimeDraft() === dashboard().checkInTimeLabel">Guardar hora</button>
+    <span class="horario-nota">
+      Hora de Madrid. Cualquier hora vale: el día de HoYoLAB cambia a las 18:00 en verano y a las 17:00 en invierno,
+      y el check-in cuenta para el día que esté en curso. Si a esa hora el NAS está apagado, lo hace al encenderse.
+    </span>
+  </form>
+
+  <dl class="cookies">
+    @for (cookie of cookies(); track cookie.kind) {
+      <div
+        class="cookie"
+        [attr.data-salud]="cookie.health">
+        <dt>{{ cookie.name }}</dt>
+        <dd>
+          <span class="cookie-salud">{{ cookieHealthLabels[cookie.health] }}</span>
+          @if (cookie.checkedAt) {
+            <span class="cookie-detalle">Comprobada el {{ cookie.checkedAt | date: 'd MMM, HH:mm' }}</span>
+          }
+          @if (cookie.health === 'missing' || cookie.health === 'expired') {
+            <span class="cookie-detalle">
+              Cópiala de {{ cookie.source }} y ponla en <code>{{ cookie.envVariable }}</code> del <code>.env</code> del NAS.
+              <a href="#guia-cookies">Cómo hacerlo</a>
+            </span>
+          }
+        </dd>
+      </div>
+    }
+  </dl>
+
+  <app-cookie-guide
+    id="guia-cookies"
+    [isOpen]="hasCookieProblem()"/>
+
+  <div class="acciones">
+    <button
+      type="button"
+      class="boton"
+      [disabled]="dashboard().isBusy"
+      (click)="onCheckInButtonClicked()">Hacer el check-in ahora</button>
+    <button
+      type="button"
+      class="boton secundario"
+      [disabled]="dashboard().isBusy"
+      (click)="onRedeemCodesButtonClicked()">Buscar y canjear códigos</button>
+    @if (dashboard().isBusy) {
+      <span class="acciones-estado">El NAS está trabajando. Entre canje y canje espera unos segundos.</span>
+    }
+    @if (actionError(); as actionError) {
+      <span
+        class="acciones-error"
+        role="alert">{{ actionError }}</span>
+    }
+  </div>
+</section>

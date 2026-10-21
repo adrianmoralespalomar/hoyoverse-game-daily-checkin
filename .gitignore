@@ -1,3 +1,7 @@
+node_modules/
+dist/
+.angular/
+data/
 .env
 logs/
-node_modules/
+server/src/deploy-id.txt

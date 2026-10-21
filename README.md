@@ -1,88 +1,90 @@
-# HoYoLAB check-in automático
+# Hoyo Games
 
-Hace cada día el check-in de HoYoLAB en **Genshin Impact**, **Honkai: Star Rail** y **Zenless Zone Zero**.
-Es Node.js puro, sin dependencias (requiere Node ≥ 20.6).
+Panel personal para **Genshin Impact**, **Honkai: Star Rail** y **Zenless Zone Zero**. Corre en el NAS (Docker) y lo hace todo solo:
 
-Por cada juego hace la misma petición que la web cuando pulsas la casilla del día, con tu cookie de sesión. No usa tu contraseña ni toca el cliente del juego.
+- **Check-in diario de HoYoLAB** a la hora que elijas en el panel (19:00 por defecto). Si el NAS estaba apagado, lo hace al arrancar.
+- **Canje automático de códigos**: cada hora consulta [hoyo-codes](https://github.com/seriaati/hoyo-codes) y canjea los nuevos en tu cuenta de Europa, uno a uno.
+- **Resina y energía**: cada 20 minutos lee las notas en tiempo real (resina original, poder trazacaminos, batería, diarias, semanales y expediciones) y calcula cuándo se llenan. Solo lee: no toca nada de tu cuenta.
+- **Panel web** (`http://192.168.1.142:4330`): los sellos de hoy, la energía, el calendario del mes de cada juego, los códigos con su estado y el estado de las cookies.
 
-## 1. Sacar la cookie
+Hace las mismas peticiones que la web oficial cuando pulsas la casilla del día o canjeas un código, con tus cookies de sesión. No usa tu contraseña ni toca el cliente del juego.
+
+```
+PC ──npm run deploy──► \\ChanoNAS\Programas\hoyo-games ──► contenedor hoyo-games (puerto 4330)
+                                                            ├─ hora elegida → check-in (HoYoLAB)
+                                                            ├─ cada hora → códigos (hoyo-codes → web de canje)
+                                                            ├─ cada 20 min → resina y energía (Crónica de batalla)
+                                                            └─ panel Angular + API
+```
+
+## 1. Sacar las cookies
+
+Hacen falta dos: una de **hoyolab.com** (check-in) y otra de **hoyoverse.com** (canje). Las dos dan acceso a tu cuenta: trátalas como una contraseña.
+
+**Check-in** (`HOYOLAB_COOKIE`):
 
 1. Abre <https://www.hoyolab.com> con la sesión iniciada.
-2. Pulsa `F12` → pestaña **Application** (o **Aplicación**) → **Cookies** → `https://www.hoyolab.com`.
-3. Escribe `v2` en el filtro y copia los valores de `ltuid_v2` y `ltoken_v2`.
-4. Monta esta línea, separando con punto y coma:
-   ```
-   ltuid_v2=123456789; ltoken_v2=v2_XXXXXXXX...
-   ```
+2. `F12` → **Application** → **Cookies** → `https://www.hoyolab.com`.
+3. Copia `ltuid_v2` y `ltoken_v2` y monta: `ltuid_v2=123456789; ltoken_v2=v2_XXXX...`
 
-> ⚠️ Esa cookie da acceso a tu cuenta de HoYoLAB: trátala como una contraseña. No la subas a git ni la compartas.
-> Si cierras sesión en HoYoLAB, la cookie deja de valer y tendrás que repetir estos pasos.
+**Canje** (`HOYOVERSE_REDEEM_COOKIE`):
 
-## 2. Configurar y probar
+1. Abre la web de canje de cualquier juego con la sesión iniciada (por ejemplo <https://hsr.hoyoverse.com/gift>).
+2. `F12` → **Application** → **Cookies** → `https://hsr.hoyoverse.com`.
+3. Copia `account_id_v2`, `account_mid_v2` y `cookie_token_v2` y monta: `account_id_v2=123456789; account_mid_v2=xxxx_hy; cookie_token_v2=v2_XXXX...`
 
-```bash
-cp .env.example .env      # en Windows: copy .env.example .env
-# edita .env y pega la cookie en HOYOLAB_COOKIE
-# para la primera prueba, pon START_JITTER_SECONDS=0
-npm start
-```
+**UID** de cada juego (`GI_UID`, `HSR_UID`, `ZZZ_UID`): sale en la propia web de canje junto a tu personaje, o en el perfil del juego.
 
-Salida esperada:
+> Si cierras sesión en HoYoLAB o en HoYoverse, esas cookies dejan de valer. El panel lo avisa en la sección **Control**: copia la nueva, pégala en el `.env` del NAS y reinicia el proyecto en UGOS.
 
-```
-[...] INFO  ✅ Genshin Impact: ok — OK
-[...] INFO  ☑️ Honkai: Star Rail: already — Ya te has registrado hoy
-[...] INFO  ✅ Zenless Zone Zero: ok — OK
-```
+## 2. Instalar en el NAS (UGREEN, Docker)
 
-| Estado | Significado | Qué hacer |
-|---|---|---|
-| `ok` | Check-in hecho | Nada |
-| `already` | Ya estaba hecho hoy | Nada |
-| `captcha` 🧩 | HoYoLAB pide captcha | Hazlo a mano ese día desde la web |
-| `bad_cookie` 🔑 | Cookie caducada | Vuelve a copiarla (paso 1) |
-| `no_account` | No tienes ese juego en esta cuenta | Quítalo de `GAMES` |
-| `error` | Otro fallo | Mira el mensaje; si se repite, avísame |
+1. Crea la carpeta `\\ChanoNAS\Programas\hoyo-games`.
+2. Copia `.env.example` como `.env` en esa carpeta y rellénalo (cookies, UIDs y, recomendado, `WEB_PASSWORD`).
+3. En el PC: `npm run install:all` (la primera vez) y `npm run deploy`.
+4. En UGOS: **Docker → Proyectos → Crear**, elige la carpeta `hoyo-games` (detecta `docker-compose.yaml`) y despliega.
+5. Abre `http://192.168.1.142:4330`.
 
-El código de salida es `0` si todo fue bien y `1` si algo requiere tu atención.
+Para actualizar el código más adelante basta con `npm run deploy`: el contenedor se reinicia solo. Si cambian las dependencias, el `Dockerfile` o el `docker-compose.yaml` (el comando avisa), hay que **reconstruir**: en UGOS, borrar el proyecto y su imagen y volver a crearlo desde la misma carpeta.
 
-Tests (sin red): `npm test`
+**Desde fuera de casa:** el Tailscale del NAS solo publica el asistente. Para entrar aquí también, habría que añadir el puerto 4330 al `serve.json` del proyecto `tailscale` (repo `asistente`, carpeta `deploy/tailscale/`).
 
-## 3. Programarlo
+## 3. Qué significa cada estado
 
-El día de HoYoLAB cambia a medianoche UTC+8: a las **18:00** en Madrid en verano y a las **17:00** en invierno. Programarlo a las **19:00** vale todo el año.
+**Check-in**
 
-### Opción A — Docker en el NAS (recomendado: funciona aunque el PC esté apagado)
+| Estado | Qué hacer |
+|---|---|
+| Hecho | Nada |
+| Pide captcha 🧩 | Hazlo a mano ese día desde HoYoLAB (el panel enlaza la página) |
+| Cookie caducada 🔑 | Vuelve a copiar `HOYOLAB_COOKIE` |
+| Sin cuenta | Quita ese juego de `GAMES` |
+| Ha fallado | Error de red o mantenimiento: se reintenta solo cada hora (hasta 3 veces al día) |
 
-Copia la carpeta al NAS, crea el `.env` y arranca el contenedor:
+**Códigos**
 
-```bash
-docker compose up -d --build
-docker logs -f hoyolab-checkin        # ver ejecuciones
-```
+| Estado | Qué significa |
+|---|---|
+| Canjeado | Recompensa enviada al correo del juego |
+| Ya lo tenías | Lo habías canjeado (en ZZZ, también si canjeaste otro de la misma familia) |
+| Caducado / No vale en EU | La fuente los comprueba con una cuenta de Asia: algunos no sirven en Europa |
+| Canjéalo a mano | HoYoverse pidió verificación. No se intenta saltar: abre la web de canje desde el panel |
+| Espera cookie nueva | La cookie de canje caducó. Se reintenta al cambiarla |
+| Reintentando | Error de red o espera entre canjes: se reintenta en la siguiente hora (hasta 5 veces) |
 
-Para lanzarlo a mano y comprobar que funciona:
-
-```bash
-docker exec hoyolab-checkin node --env-file=/app/.env index.js
-```
-
-La hora se cambia en `crontab`, reconstruyendo después con `docker compose up -d --build`.
-
-### Opción B — Programador de tareas de Windows
-
-1. *Programador de tareas* → **Crear tarea básica** → Diaria, 19:00.
-2. Acción **Iniciar un programa**:
-   - Programa: `node`
-   - Argumentos: `--env-file=.env index.js`
-   - Iniciar en: la ruta de esta carpeta
-3. En las propiedades de la tarea, marca **Ejecutar la tarea lo antes posible si no se pudo iniciar a la hora programada**, para que se ejecute al encender el PC si estaba apagado a esa hora.
+**Resina y energía**: si sale "Activa Notas en tiempo real", entra en tu Crónica de batalla en hoyolab.com → ajustes (engranaje) y actívalas para ese juego. Si sale "pide verificación", abre la Crónica en la web, resuelve el captcha y pulsa **Leer ahora** en el panel.
 
 ## Por qué está hecho así (para reducir riesgos)
 
-- **Una sola petición por juego y día**, como si pulsaras tú. Solo se reintenta ante un fallo de red, nunca ante una respuesta de HoYoLAB.
-- **No intenta saltarse el captcha.** Si aparece, se detiene y te lo indica.
-- **Se detiene si la cookie no vale**, sin probar con los demás juegos.
-- **Pausas aleatorias** entre juegos y al arrancar (`START_JITTER_SECONDS`).
-- **La cookie solo vive en tu `.env`**, que nunca sale de tu máquina ni pasa por servicios de terceros.
-- **Las notificaciones (Telegram/Discord) están pendientes.** Hay un hueco preparado en la función `notify()` de `index.js`.
+- **Una sola petición por juego y día** para el check-in, como si pulsaras tú. Solo se reintenta ante fallos de red.
+- **Canjes espaciados** 6–9 segundos, como la web oficial exige entre canjes.
+- **No intenta saltarse captchas ni verificaciones.** Si aparecen, se detiene y te lo indica.
+- **Se detiene si una cookie no vale** y no la vuelve a probar hasta que la cambies.
+- **Las cookies solo viven en el `.env` del NAS.** En `data/` solo se guarda una huella para saber si cambiaron.
+
+## Desarrollo
+
+- `npm test`: tests del servidor, sin red.
+- `npm run typecheck` y `npm run build:web`: comprobaciones.
+- `npm start`: daemon local en `http://127.0.0.1:4330` con el `.env` y `data/` de la raíz del repo.
+- `npm start --prefix web`: panel en `http://localhost:4200` con los datos del NAS (o del daemon de `HOYO_GAMES_URL`).

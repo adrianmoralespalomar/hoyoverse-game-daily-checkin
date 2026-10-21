@@ -1,0 +1,46 @@
+@if (needsLogin()) {
+  <app-login-form/>
+} @else {
+  <header class="barra">
+    <a
+      class="marca"
+      href="#hoy">Hoyo Games</a>
+    <nav aria-label="Juegos">
+      @for (game of dashboard()?.games; track game.id) {
+        <a
+          [href]="'#' + game.id"
+          [style.--acento]="gameThemes[game.id].accent">{{ gameThemes[game.id].shortName }}</a>
+      }
+    </nav>
+    <a
+      class="estado"
+      href="#control"
+      [class.trabajando]="dashboard()?.isBusy">{{ dashboard()?.isBusy ? 'Trabajando…' : 'Control' }}</a>
+  </header>
+
+  <main>
+    @if (hoyoGamesApi.dashboard.error()) {
+      <span
+        class="aviso"
+        role="alert">
+        No llego al NAS. Comprueba en UGOS → Docker que el proyecto «hoyo-games» está en marcha.
+      </span>
+    }
+    @if (dashboard(); as dashboard) {
+      <app-today-hero
+        id="hoy"
+        [dashboard]="dashboard"/>
+      @for (game of dashboard.games; track game.id) {
+        <app-game-chapter
+          [id]="game.id"
+          [game]="game"
+          [checkInTimeLabel]="dashboard.checkInTimeLabel"/>
+      }
+      <app-control-panel
+        id="control"
+        [dashboard]="dashboard"/>
+    } @else if (!hoyoGamesApi.dashboard.error()) {
+      <span class="cargando">Leyendo el NAS…</span>
+    }
+  </main>
+}

@@ -1,11 +1,12 @@
-FROM node:22-alpine
+# Imagen con Node y las dependencias del servidor. El código (server/src y web/dist) no va dentro: se monta desde
+# la carpeta del NAS, así que para actualizar basta con `npm run deploy` desde el PC, sin reconstruir la imagen.
+# Solo hay que reconstruir si cambian las dependencias (server/package-lock.json) o este fichero.
 
-ENV TZ=Europe/Madrid
-RUN apk add --no-cache tzdata
-
+FROM node:24-alpine
 WORKDIR /app
-COPY index.js package.json ./
-COPY crontab /etc/crontabs/root
-
-# El .env se monta como volumen (no se copia a la imagen)
-CMD ["crond", "-f", "-l", "8"]
+COPY server/package.json server/package-lock.json server/
+RUN npm ci --omit=dev --prefix server
+ENV HOST=0.0.0.0
+EXPOSE 4330
+# --watch reinicia el daemon cuando `npm run deploy` copia código nuevo
+CMD ["node", "--watch", "server/src/daemon.ts"]

@@ -1,0 +1,72 @@
+<div class="energia">
+  @if (stamina(); as stamina) {
+    <div
+      class="energia-principal"
+      [class.llena]="stamina.isFull">
+      <span class="energia-nombre">{{ stamina.label }}</span>
+      <span class="energia-cifra">
+        <strong>{{ stamina.current }}</strong>/{{ stamina.max }}
+      </span>
+      <div
+        class="barra"
+        role="progressbar"
+        [attr.aria-label]="stamina.label"
+        [attr.aria-valuenow]="stamina.current"
+        [attr.aria-valuemax]="stamina.max">
+        <span
+          class="barra-relleno"
+          [style.width.%]="stamina.percent"></span>
+      </div>
+      <span class="energia-cuando">{{ stamina.readyText }}</span>
+    </div>
+  }
+
+  @if (meters().length) {
+    <ul class="contadores">
+      @for (meter of meters(); track meter.label) {
+        <li [class.completo]="meter.isFull">
+          <span class="contador-nombre">{{ meter.label }}</span>
+          <span class="contador-cifra">{{ meter.current }}/{{ meter.max }}</span>
+          <div
+            class="barra"
+            aria-hidden="true">
+            <span
+              class="barra-relleno"
+              [style.width.%]="meter.percent"></span>
+          </div>
+          @if (meter.readyText) {
+            <span class="contador-cuando">{{ meter.readyText }}</span>
+          }
+        </li>
+      }
+    </ul>
+  }
+
+  @if (expeditionsText(); as expeditionsText) {
+    <span class="expediciones">{{ expeditionsText }}</span>
+  }
+
+  @if (notesState().error; as error) {
+    <span
+      class="energia-error"
+      role="alert">{{ error }}</span>
+  }
+  @if (notesState().disabledReason; as disabledReason) {
+    <span class="energia-pie">No se puede leer la resina: {{ disabledReason }}.</span>
+  } @else {
+    <div class="energia-pie">
+      <span>
+        @if (notes(); as notes) {
+          Leído a las {{ notes.fetchedAt | date: 'H:mm' }}. Se vuelve a leer cada 20 minutos; entre medias, se calcula.
+        } @else {
+          Aún sin leer. Se lee cada 20 minutos.
+        }
+      </span>
+      <button
+        type="button"
+        class="boton secundario"
+        [disabled]="isRefreshing()"
+        (click)="onRefreshNotesButtonClicked()">{{ isRefreshing() ? 'Leyendo…' : 'Leer ahora' }}</button>
+    </div>
+  }
+</div>

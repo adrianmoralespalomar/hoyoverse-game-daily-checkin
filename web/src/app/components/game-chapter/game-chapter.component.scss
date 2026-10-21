@@ -1,0 +1,214 @@
+section.capitulo {
+  border-top: 1px solid var(--linea);
+  display: grid;
+  gap: 2.5rem 4rem;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.6fr);
+  padding-block: clamp(4rem, 10vh, 7rem);
+
+  > :not(header) {
+    grid-column: 2;
+  }
+
+  // El nombre del juego se queda fijo mientras pasan su calendario y sus códigos
+  header.capitulo-cabecera {
+    align-self: start;
+    display: grid;
+    gap: 1rem;
+    grid-row: span 4;
+    position: sticky;
+    top: 6rem;
+
+    h2 {
+      color: var(--acento);
+      font-size: clamp(3rem, 6.5vw, 5.6rem);
+      font-variation-settings: 'opsz' 96, 'wdth' 75;
+      text-wrap: balance;
+    }
+
+    span.capitulo-racha {
+      color: var(--apagado);
+      display: block;
+      font-size: 1.1rem;
+    }
+
+    span.capitulo-problema {
+      color: var(--error);
+      display: block;
+    }
+  }
+
+  span.vacio {
+    color: var(--apagado);
+    display: block;
+  }
+}
+
+ol.calendario {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li.dia {
+    align-items: center;
+    background: var(--superficie);
+    border-radius: var(--radio-pequeno);
+    display: grid;
+    justify-items: center;
+    padding: 0.4rem 0.25rem 0.5rem;
+    position: relative;
+
+    span.dia-numero {
+      color: var(--apagado);
+      font-size: 0.7rem;
+      justify-self: start;
+      padding-left: 0.3rem;
+    }
+
+    img {
+      aspect-ratio: 1;
+      height: auto;
+      object-fit: contain;
+      width: min(100%, 3rem);
+    }
+
+    span.dia-cantidad {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    &.reclamado {
+      background: color-mix(in oklab, var(--acento) 34%, var(--superficie));
+
+      span.dia-numero {
+        color: var(--acento);
+      }
+    }
+
+    &.hoy {
+      box-shadow: inset 0 0 0 2px var(--acento);
+    }
+  }
+}
+
+// Al hacer scroll, los días ya sellados se van tiñendo uno detrás de otro (solo navegadores que lo soportan)
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    ol.calendario li.dia.reclamado {
+      animation: sellar linear both;
+      animation-range: entry calc(20% + var(--orden) * 1.6%) cover calc(35% + var(--orden) * 1.6%);
+      animation-timeline: view();
+    }
+  }
+}
+
+@keyframes sellar {
+  from {
+    background: var(--superficie);
+    scale: 0.9;
+  }
+}
+
+.codigos {
+  display: grid;
+  gap: 1rem;
+
+  h3 {
+    font-size: 1.8rem;
+    font-variation-settings: 'opsz' 72, 'wdth' 85;
+  }
+
+  span.codigos-estado {
+    color: var(--apagado);
+    display: block;
+    font-size: 0.95rem;
+  }
+
+  ul.codigos-lista {
+    display: grid;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li.codigo {
+    align-items: baseline;
+    border-bottom: 1px solid var(--linea);
+    display: grid;
+    gap: 0.25rem 1rem;
+    grid-template-columns: minmax(9rem, auto) 1fr auto;
+    padding-block: 0.8rem;
+
+    code {
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+    }
+
+    span.codigo-premios {
+      color: var(--apagado);
+      font-size: 0.92rem;
+    }
+
+    span.codigo-estado {
+      border-radius: 999px;
+      box-shadow: inset 0 0 0 1px var(--linea);
+      font-size: 0.82rem;
+      padding: 0.15rem 0.7rem;
+      white-space: nowrap;
+
+      &[data-estado='redeemed'] {
+        background: var(--acento);
+        box-shadow: none;
+        color: var(--fondo);
+        font-weight: 650;
+      }
+
+      &[data-estado='manual'],
+      &[data-estado='bad_cookie'],
+      &[data-estado='failed'] {
+        box-shadow: inset 0 0 0 1px var(--error);
+        color: var(--error);
+      }
+    }
+
+    a.codigo-enlace {
+      color: var(--acento);
+      font-size: 0.9rem;
+      grid-column: 1 / -1;
+    }
+
+    &.inactivo {
+      opacity: 0.55;
+    }
+  }
+}
+
+@media (max-width: 52rem) {
+  section.capitulo {
+    grid-template-columns: minmax(0, 1fr);
+
+    > :not(header) {
+      grid-column: 1;
+    }
+
+    header.capitulo-cabecera {
+      grid-row: auto;
+      position: static;
+    }
+  }
+
+  ol.calendario {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .codigos li.codigo {
+    grid-template-columns: 1fr auto;
+
+    span.codigo-premios {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+  }
+}

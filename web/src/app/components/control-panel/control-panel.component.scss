@@ -1,0 +1,132 @@
+section.control {
+  border-top: 1px solid var(--linea);
+  display: grid;
+  gap: 2rem;
+  padding-block: clamp(4rem, 10vh, 7rem) 2rem;
+
+  h2 {
+    font-size: clamp(2.6rem, 5vw, 4rem);
+    font-variation-settings: 'opsz' 96, 'wdth' 78;
+  }
+
+  ul.problemas {
+    color: var(--error);
+    display: grid;
+    gap: 0.4rem;
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+
+  form.horario {
+    align-items: end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+
+    label {
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    span.horario-titulo {
+      display: block;
+      font-weight: 600;
+    }
+
+    input {
+      background: var(--superficie);
+      border: 1px solid var(--linea);
+      border-radius: var(--radio-pequeno);
+      color: var(--tinta);
+      font: inherit;
+      font-size: 1.4rem;
+      font-weight: 650;
+      padding: 0.4rem 0.8rem;
+    }
+
+    span.horario-nota {
+      color: var(--apagado);
+      display: block;
+      flex-basis: 100%;
+      font-size: 0.9rem;
+      max-width: 70ch;
+    }
+  }
+
+  dl.cookies {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    margin: 0;
+
+    .cookie {
+      background: var(--superficie);
+      border-radius: var(--radio-grande);
+      display: grid;
+      gap: 0.5rem;
+      padding: 1.5rem;
+
+      dt {
+        font-size: 1.3rem;
+        font-weight: 700;
+      }
+
+      dd {
+        display: grid;
+        gap: 0.4rem;
+        margin: 0;
+      }
+
+      span.cookie-salud {
+        display: block;
+        font-weight: 600;
+      }
+
+      span.cookie-detalle {
+        color: var(--apagado);
+        display: block;
+        font-size: 0.9rem;
+        overflow-wrap: anywhere;
+
+        a {
+          color: var(--tinta);
+        }
+      }
+
+      &[data-salud='ok'] span.cookie-salud {
+        color: #8fe3b4;
+      }
+
+      &[data-salud='expired'],
+      &[data-salud='missing'] {
+        box-shadow: inset 0 0 0 1px var(--error);
+
+        span.cookie-salud {
+          color: var(--error);
+        }
+      }
+    }
+  }
+
+  .acciones {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+
+    span.acciones-estado,
+    span.acciones-error {
+      display: block;
+      flex-basis: 100%;
+      font-size: 0.95rem;
+    }
+
+    span.acciones-estado {
+      color: var(--apagado);
+    }
+
+    span.acciones-error {
+      color: var(--error);
+    }
+  }
+}

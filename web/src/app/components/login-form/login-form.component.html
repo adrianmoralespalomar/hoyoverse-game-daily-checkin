@@ -1,0 +1,26 @@
+<form
+  class="acceso"
+  (submit)="$event.preventDefault(); onLoginFormSubmitted()">
+  <h1>Hoyo Games</h1>
+  <label class="campo">
+    <span>Contraseña del panel</span>
+    <input
+      type="password"
+      autocomplete="current-password"
+      required
+      [value]="password()"
+      (input)="onPasswordChanged($event)"/>
+  </label>
+  @if (loginError()) {
+    <span
+      class="error"
+      role="alert">{{ loginError() }}</span>
+  }
+  <button
+    type="submit"
+    class="boton"
+    [disabled]="isLoggingIn() || !password()">{{ isLoggingIn() ? 'Entrando…' : 'Entrar' }}</button>
+  <span class="olvido">
+    Está en <code>WEB_PASSWORD</code>, en el <code>.env</code> del NAS. Este navegador la recordará un año.
+  </span>
+</form>

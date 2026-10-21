@@ -1,0 +1,24 @@
+services:
+  hoyo-games:
+    build: .
+    container_name: hoyo-games
+    restart: unless-stopped
+    ports:
+      - "4330:4330"
+    # Registros del contenedor (UGOS → Registros): como mucho 3 ficheros de 1 MB, se borran los más viejos
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+        max-file: "3"
+    environment:
+      # Hora de las tareas programadas (check-in a las 19:00)
+      TZ: Europe/Madrid
+    volumes:
+      # Cookies, UIDs y contraseña: el daemon lee el .env al arrancar, así que basta con reiniciar tras cambiarlo
+      - ./.env:/app/.env:ro
+      # Código que copia `npm run deploy` desde el PC (solo lectura para el contenedor)
+      - ./server/src:/app/server/src:ro
+      - ./web/dist:/app/web/dist:ro
+      # Historial de check-in, códigos canjeados y estado de las cookies: solo existen aquí, en el NAS
+      - ./data:/app/data
