@@ -1,0 +1,102 @@
+<div class="tiradas">
+  <h3>Tiradas</h3>
+
+  @if (banners().length) {
+    <ul class="gachapones">
+      @for (banner of banners(); track banner.kind) {
+        <li>
+          <span class="gachapon-nombre">{{ bannerKindLabels[banner.kind] }}</span>
+          <span class="gachapon-pity">
+            <strong>{{ banner.pity }}</strong>/{{ banner.hardPity }}
+          </span>
+          <div
+            class="barra"
+            role="progressbar"
+            [attr.aria-label]="'Pity del gachapón ' + bannerKindLabels[banner.kind]"
+            [attr.aria-valuenow]="banner.pity"
+            [attr.aria-valuemax]="banner.hardPity">
+            <span
+              class="barra-relleno"
+              [style.width.%]="banner.percent"></span>
+          </div>
+          <span class="gachapon-detalle">
+            @if (banner.nextTopText) {
+              {{ banner.nextTopText }}.
+            }
+            {{ banner.pullsThisVersion }} tiradas esta versión, {{ banner.totalPulls }} en total.
+          </span>
+          @if (banner.lastTopPulls.length) {
+            <ol
+              class="ultimos"
+              [attr.aria-label]="'Últimos ' + theme().topRankLabel">
+              @for (pull of banner.lastTopPulls; track pull.at + pull.name) {
+                <li
+                  [class.perdido]="pull.wonFiftyFifty === false"
+                  [attr.title]="pull.at | date: 'd MMM y'">
+                  {{ pull.name }}
+                  <span class="ultimo-pity">{{ pull.pity }}</span>
+                  @if (pull.wonFiftyFifty === false) {
+                    <span class="ultimo-nota">50/50 perdido</span>
+                  }
+                </li>
+              }
+            </ol>
+          }
+        </li>
+      }
+    </ul>
+  }
+
+  @if (wishesState().isImporting) {
+    <span
+      class="tiradas-estado"
+      role="status">Descargando el historial. La primera vez tarda unos minutos.</span>
+  } @else if (wishesState().hasValidLink) {
+    <span class="tiradas-estado">Enlace válido: las tiradas nuevas llegan solas cada hora durante 24 horas.</span>
+  } @else if (wishesState().summary; as summary) {
+    <span class="tiradas-estado">
+      Actualizado el {{ summary.updatedAt | date: 'd MMM, H:mm' }}. Para traer las nuevas, pega un enlace reciente.
+    </span>
+  }
+  @if (wishesState().error; as error) {
+    <span
+      class="tiradas-error"
+      role="alert">{{ error }}</span>
+  }
+
+  <form
+    class="enlace"
+    (submit)="$event.preventDefault(); onWishLinkFormSubmitted()">
+    <label>
+      <span class="enlace-titulo">Enlace del historial de tiradas</span>
+      <input
+        type="url"
+        required
+        autocomplete="off"
+        placeholder="https://…authkey=…"
+        [value]="linkDraft()"
+        (input)="onWishLinkChanged($event)"/>
+    </label>
+    <button
+      type="submit"
+      class="boton secundario"
+      [disabled]="!linkDraft().trim() || isSending() || wishesState().isImporting">Importar</button>
+  </form>
+  @if (importError(); as importError) {
+    <span
+      class="tiradas-error"
+      role="alert">{{ importError }}</span>
+  }
+
+  <details class="como">
+    <summary>Cómo sacar el enlace</summary>
+    <ol>
+      <li>En el PC donde juegas, abre el juego y entra en el historial de tiradas.</li>
+      <li>
+        En PowerShell, desde la carpeta del repo:
+        <code>{{ scriptCommand() }}</code>
+      </li>
+      <li>El enlace queda copiado: pégalo arriba. Dura 24 horas y no da acceso a tu cuenta, solo al historial.</li>
+    </ol>
+  </details>
+</div>

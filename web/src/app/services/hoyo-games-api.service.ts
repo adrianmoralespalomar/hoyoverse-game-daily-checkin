@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import type { AuthStatus } from '../models/auth-status.interface';
 import type { Dashboard } from '../models/dashboard.interface';
+import type { GameId } from '../models/game-id.type';
 
 /** Habla con el daemon del NAS. Las tareas se lanzan y el panel sigue su avance con `dashboard.isBusy`. */
 @Injectable({ providedIn: 'root' })
@@ -31,6 +32,21 @@ export class HoyoGamesApiService {
 
   saveCheckInTime(checkInTime: string): Promise<void> {
     return this.post('/api/settings/check-in-time', { checkInTime }, 'PUT');
+  }
+
+  /** Espera a que el NAS lea de nuevo el calendario, el contenido final y el diario de todos los juegos. */
+  refreshProgress(): Promise<void> {
+    return this.post('/api/progress/refresh', {});
+  }
+
+  /** `pulls` a `null` borra la estimación. */
+  saveF2pPulls(gameId: GameId, version: string, pulls: number | null): Promise<void> {
+    return this.post('/api/settings/f2p-pulls', { gameId, version, pulls }, 'PUT');
+  }
+
+  /** El NAS reconoce el juego por el enlace y descarga el historial aparte (el panel sigue `isImporting`). */
+  importWishes(link: string): Promise<void> {
+    return this.post('/api/wishes/import', { link });
   }
 
   /** Lanza el mensaje del daemon (`{ error }`) en vez del genérico de Angular. */

@@ -9,12 +9,12 @@ section.capitulo {
     grid-column: 2;
   }
 
-  // El nombre del juego se queda fijo mientras pasan su calendario y sus códigos
+  // El nombre del juego se queda fijo mientras pasan sus paneles, su calendario y sus códigos
   header.capitulo-cabecera {
     align-self: start;
     display: grid;
     gap: 1rem;
-    grid-row: span 4;
+    grid-row: span 7;
     position: sticky;
     top: 6rem;
 

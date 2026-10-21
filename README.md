@@ -5,6 +5,9 @@ Panel personal para **Genshin Impact**, **Honkai: Star Rail** y **Zenless Zone Z
 - **Check-in diario de HoYoLAB** a la hora que elijas en el panel (19:00 por defecto). Si el NAS estaba apagado, lo hace al arrancar.
 - **Canje automático de códigos**: cada hora consulta [hoyo-codes](https://github.com/seriaati/hoyo-codes) y canjea los nuevos en tu cuenta de Europa, uno a uno.
 - **Resina y energía**: cada 20 minutos lee las notas en tiempo real (resina original, poder trazacaminos, batería, diarias, semanales y expediciones) y calcula cuándo se llenan. Solo lee: no toca nada de tu cuenta.
+- **Contenido final, versión y banners**: cada 2 horas lee el calendario de HoYoLAB (Abismo, Teatro, Asalto estigio, Memoria del Caos, Ficción Pura, Sombra Apocalíptica, Arbitraje, Defensa de Shiyu, Asalto letal): estrellas, lo que te queda por ganar (aproximado), cuándo se renueva, eventos sin completar y los días que quedan de versión y de banners.
+- **Ingresos de la versión**: protogemas, jade estelar o películas ganadas en la versión según el diario de HoYoLAB, por fuente. Si apuntas en el panel cuántas tiradas da la versión a un F2P (de tu hoja de la comunidad), te dice cuántas te faltan.
+- **Historial de tiradas**: pegas el enlace del historial del juego (dura 24 horas) y enseña el pity de cada gachapón, si el próximo va a 50/50 o garantizado, los últimos 5★ y las tiradas de la versión. Mientras el enlace vale, trae las nuevas cada hora.
 - **Panel web** (`http://192.168.1.142:4330`): los sellos de hoy, la energía, el calendario del mes de cada juego, los códigos con su estado y el estado de las cookies.
 
 Hace las mismas peticiones que la web oficial cuando pulsas la casilla del día o canjeas un código, con tus cookies de sesión. No usa tu contraseña ni toca el cliente del juego.
@@ -14,6 +17,7 @@ PC ──npm run deploy──► \\ChanoNAS\Programas\hoyo-games ──► conte
                                                             ├─ hora elegida → check-in (HoYoLAB)
                                                             ├─ cada hora → códigos (hoyo-codes → web de canje)
                                                             ├─ cada 20 min → resina y energía (Crónica de batalla)
+                                                            ├─ cada 2 horas → calendario, contenido final y diario
                                                             └─ panel Angular + API
 ```
 
@@ -73,6 +77,16 @@ Para actualizar el código más adelante basta con `npm run deploy`: el contened
 | Reintentando | Error de red o espera entre canjes: se reintenta en la siguiente hora (hasta 5 veces) |
 
 **Resina y energía**: si sale "Activa Notas en tiempo real", entra en tu Crónica de batalla en hoyolab.com → ajustes (engranaje) y actívalas para ese juego. Si sale "pide verificación", abre la Crónica en la web, resuelve el captcha y pulsa **Leer ahora** en el panel.
+
+**Diario de ingresos**: necesita las dos cookies del `.env` (Star Rail no lo da solo con la de HoYoLAB).
+
+**Historial de tiradas**: abre el juego en el PC, entra en el historial de tiradas y, desde la carpeta del repo, ejecuta (con `gi`, `hsr` o `zzz`):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\get-wish-link.ps1 -Game gi
+```
+
+Copia el enlace de la caché del juego al portapapeles; pégalo en la sección Tiradas del juego. El enlace solo da acceso al historial, no a la cuenta, y el NAS no lo guarda en disco. Si en el gachapón estándar entra un 5★ nuevo, añádelo a `server/src/models/standard-characters.const.ts` para que el 50/50 se cuente bien.
 
 ## Por qué está hecho así (para reducir riesgos)
 

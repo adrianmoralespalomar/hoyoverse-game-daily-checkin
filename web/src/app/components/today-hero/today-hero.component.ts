@@ -8,6 +8,7 @@ import type { TodayStamp } from '../../models/today-stamp.interface';
 import { ClockService } from '../../services/clock.service';
 import { getHoyolabDayKey } from '../../utils/hoyolab-day';
 import { estimateStamina } from '../../utils/realtime-notes';
+import { formatDaysLeft } from '../../utils/time-left';
 import { getTodayReward } from '../../utils/today-reward';
 
 /** Lo primero que se ve: un sello por juego con la recompensa de hoy, que cae al cargar. */
@@ -51,12 +52,30 @@ export class TodayHeroComponent {
       hasFailed,
       statusText: this.getStampStatusText(checkIn, needsYou || hasFailed),
       energyText: this.getEnergyText(game),
+      calendarLines: this.getCalendarLines(game),
     };
   }
 
   private getEnergyText(game: GameDashboard): string | null {
     const notes = game.notes?.notes;
     return notes ? `${notes.stamina.label} ${estimateStamina(notes, this.clock.now())}/${notes.stamina.max}` : null;
+  }
+
+  /** Lo que queda de versión y de los banners de personaje (cambian a mitad de versión). */
+  private getCalendarLines(game: GameDashboard): string[] {
+    const progress = game.progress?.progress;
+    if (!progress) return [];
+    const now = this.clock.now();
+    const lines: string[] = [];
+    const { version } = progress;
+    if (version) lines.push(`Versión ${version.name}: ${formatDaysLeft(version.endsAt, now)}${version.estimatedEdge === 'end' ? ' (aprox.)' : ''}`);
+    const characterBanners = progress.banners.filter(banner => banner.kind === 'character');
+    const featured = characterBanners.flatMap(banner => banner.featured);
+    if (featured.length) {
+      const bannersEndAt = characterBanners.map(banner => banner.endsAt).sort()[0];
+      lines.push(`${featured.join(' y ')}: ${formatDaysLeft(bannersEndAt, now)}`);
+    }
+    return lines;
   }
 
   private getStampStatusText(checkIn: NonNullable<GameDashboard['checkIn']>, hasProblem: boolean): string {

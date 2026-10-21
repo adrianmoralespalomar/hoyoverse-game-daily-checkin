@@ -17,9 +17,12 @@ import { PUBLIC_API_PATHS } from './models/public-api-paths.const.ts';
 import { CheckInService } from './services/check-in-service.ts';
 import { CodeRedemptionService } from './services/code-redemption-service.ts';
 import { CookieStateStore } from './services/cookie-state-store.ts';
+import { IncomeService } from './services/income-service.ts';
 import { NotesService } from './services/notes-service.ts';
+import { ProgressService } from './services/progress-service.ts';
 import { TaskScheduler } from './services/task-scheduler.ts';
 import { UserSettingsStore } from './services/user-settings-store.ts';
+import { WishHistoryService } from './services/wish-history-service.ts';
 
 const deployId = existsSync(DEPLOY_ID_FILE_PATH) ? readFileSync(DEPLOY_ID_FILE_PATH, 'utf8').trim() : 'local';
 const settings = readAppSettings();
@@ -30,8 +33,11 @@ const checkIn = new CheckInService(games, cookies, settings.startJitterMs);
 const codes = new CodeRedemptionService(games, cookies);
 const runner = new ExclusiveRunner();
 const notes = new NotesService(games, cookies);
+const progress = new ProgressService(games, cookies);
+const income = new IncomeService(games, cookies);
+const wishes = new WishHistoryService(games);
 const userSettings = new UserSettingsStore();
-const scheduler = new TaskScheduler(runner, checkIn, codes, notes);
+const scheduler = new TaskScheduler(runner, checkIn, codes, notes, progress, income, wishes);
 scheduler.start(userSettings.get().checkInTime);
 
 const app = Fastify();
@@ -63,7 +69,19 @@ app.get('/api/dashboard', async (): Promise<Dashboard> => ({
   checkInTimeLabel: userSettings.get().checkInTime,
   cookies: { checkIn: withoutFingerprint(cookies.get('checkIn')), redeem: withoutFingerprint(cookies.get('redeem')) },
   problems: settings.problems,
-  games: games.map(game => ({ id: game.id, name: game.name, checkIn: checkIn.getView(game), codes: codes.getView(game), notes: notes.getView(game) })),
+  games: games.map(game => {
+    const version = progress.getVersion(game.id);
+    return {
+      id: game.id,
+      name: game.name,
+      checkIn: checkIn.getView(game),
+      codes: codes.getView(game),
+      notes: notes.getView(game),
+      progress: progress.getView(game),
+      income: income.getView(game, version, userSettings.getF2pPulls(game.id, version?.name)),
+      wishes: wishes.getView(game, version),
+    };
+  }),
 }));
 
 // Las tareas pueden tardar (pausas entre juegos y entre canjes): se lanzan y el panel sigue `isBusy`
@@ -82,6 +100,26 @@ app.put<{ Body: { checkInTime?: unknown } }>('/api/settings/check-in-time', asyn
 app.post('/api/notes/refresh', async () => {
   await notes.refresh();
   return { ok: true };
+});
+
+app.put<{ Body: { gameId?: unknown; version?: unknown; pulls?: unknown } }>('/api/settings/f2p-pulls', async ({ body }) => {
+  const game = games.find(({ id }) => id === body?.gameId);
+  if (!game) throw new Error('Juego desconocido');
+  userSettings.saveF2pPulls(game.id, body?.version, body?.pulls);
+  return { ok: true };
+});
+
+// Calendario, contenido final y diario: unos segundos por juego, se espera igual que las notas
+app.post('/api/progress/refresh', async () => {
+  await scheduler.refreshProgressAndIncome();
+  return { ok: true };
+});
+
+// El enlace va en el cuerpo (nunca en la URL ni en el log). La primera descarga tarda minutos: se lanza y el panel sigue `isImporting`
+app.post<{ Body: { link?: unknown } }>('/api/wishes/import', async ({ body }) => {
+  const game = wishes.saveLink(body?.link);
+  runner.run(() => wishes.importWishes(game)).catch((error: Error) => log('ERROR', `Historial fallido: ${error.message}`));
+  return { ok: true, gameId: game.id };
 });
 
 app.post('/api/codes/run', async () => {

@@ -93,6 +93,15 @@ a.sello {
     padding-top: 0.5rem;
   }
 
+  // Como el texto pequeño de un sello: fechas de la versión y de los banners
+  span.sello-calendario {
+    display: grid;
+    font-size: 0.82rem;
+    gap: 0.1rem;
+    line-height: 1.3;
+    opacity: 0.8;
+  }
+
   // Aire bajo la última línea, sea cual sea (el matasellos va aparte, en absoluto)
   &::after {
     content: '';

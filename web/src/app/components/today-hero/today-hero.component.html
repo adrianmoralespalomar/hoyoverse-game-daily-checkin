@@ -26,6 +26,13 @@
         @if (stamp.energyText) {
           <span class="sello-energia">{{ stamp.energyText }}</span>
         }
+        @if (stamp.calendarLines.length) {
+          <span class="sello-calendario">
+            @for (line of stamp.calendarLines; track line) {
+              <span>{{ line }}</span>
+            }
+          </span>
+        }
         @if (stamp.isDone) {
           <span
             class="sello-marca"

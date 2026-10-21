@@ -25,6 +25,27 @@
     <app-energy-panel [notesState]="notesState"/>
   }
 
+  @if (game().progress; as progressState) {
+    <app-endgame-panel
+      [progressState]="progressState"
+      [theme]="theme()"/>
+  }
+
+  @if (game().income; as incomeState) {
+    <app-income-panel
+      [gameId]="game().id"
+      [incomeState]="incomeState"
+      [pendingEventsCurrency]="pendingEventsCurrency()"
+      [theme]="theme()"/>
+  }
+
+  @if (game().wishes; as wishesState) {
+    <app-wish-panel
+      [gameId]="game().id"
+      [theme]="theme()"
+      [wishesState]="wishesState"/>
+  }
+
   @if (calendarDays().length) {
     <ol
       class="calendario"

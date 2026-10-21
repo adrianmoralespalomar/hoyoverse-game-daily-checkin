@@ -15,4 +15,6 @@ export interface TodayStamp {
   statusText: string;
   /** "Resina original 96/200", si ya se ha leído. */
   energyText: string | null;
+  /** "Versión 7.1: quedan 13 días" y "Skirk y Escoffier: quedan 13 días", si ya se ha leído el calendario. */
+  calendarLines: string[];
 }

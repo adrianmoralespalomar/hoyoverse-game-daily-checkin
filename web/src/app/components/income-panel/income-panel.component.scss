@@ -1,0 +1,111 @@
+.ingresos {
+  display: grid;
+  gap: 1rem;
+
+  h3 {
+    font-size: 1.8rem;
+    font-variation-settings: 'opsz' 72, 'wdth' 85;
+  }
+
+  span.ingresos-total {
+    color: var(--apagado);
+    display: block;
+    font-size: 1.1rem;
+
+    strong {
+      color: var(--acento);
+      font-size: clamp(2.4rem, 5vw, 3.4rem);
+      font-variation-settings: 'opsz' 96, 'wdth' 80;
+      font-weight: 750;
+      letter-spacing: -0.03em;
+    }
+  }
+
+  ul.fuentes {
+    display: grid;
+    gap: 0.6rem 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      display: grid;
+      font-size: 0.92rem;
+      gap: 0.3rem;
+      grid-template-columns: 1fr auto;
+
+      span.fuente-cifra {
+        color: var(--apagado);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .barra {
+        background: var(--superficie-alta);
+        border-radius: 999px;
+        grid-column: 1 / -1;
+        height: 0.3rem;
+        overflow: hidden;
+
+        span.barra-relleno {
+          background: color-mix(in oklab, var(--acento) 70%, var(--superficie-alta));
+          border-radius: inherit;
+          display: block;
+          height: 100%;
+        }
+      }
+    }
+  }
+
+  form.estimacion {
+    align-items: end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    label {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    span.estimacion-titulo {
+      display: block;
+      font-size: 0.92rem;
+    }
+
+    input {
+      background: var(--superficie);
+      border: 1px solid var(--linea);
+      border-radius: var(--radio-pequeno);
+      color: inherit;
+      font: inherit;
+      padding: 0.5rem 0.75rem;
+      width: 9rem;
+    }
+
+    button.boton {
+      font-size: 0.9rem;
+      padding: 0.55rem 1rem;
+    }
+  }
+
+  span.estimacion-resultado {
+    display: block;
+    font-weight: 600;
+
+    &.al-dia {
+      color: var(--acento);
+    }
+  }
+
+  span.ingresos-error {
+    color: var(--error);
+    display: block;
+  }
+
+  span.ingresos-pie {
+    color: var(--apagado);
+    display: block;
+    font-size: 0.88rem;
+  }
+}

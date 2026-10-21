@@ -7,7 +7,7 @@ Check-in diario de HoYoLAB y canje automático de códigos de Genshin, Star Rail
 - `server/`: Node 24 ejecutando TypeScript directamente (type stripping), sin paso de build.
   - `src/daemon.ts`: API HTTP, panel estático y arranque del planificador (`services/task-scheduler.ts`).
   - `src/games/`: un `GameModule` por juego (`models/game-module.interface.ts`), con capacidades opcionales. Los de HoYoverse salen de `models/hoyoverse-games.const.ts`; las peticiones de canje se copiaron del tráfico real de cada web.
-  - `src/services/`: check-in, canje de códigos, notas en tiempo real (resina/energía, con firma DS de `core/dynamic-secret.ts`) y estado de las cookies. Guardan en `data/` (JSON).
+  - `src/services/`: check-in, canje de códigos, notas en tiempo real (resina/energía, con firma DS de `core/dynamic-secret.ts`), calendario y contenido final (`progress`), diario de ingresos (`income`), historial de tiradas (`wish-history`) y estado de las cookies. Guardan en `data/` (JSON).
 - `web/`: Angular 22 (standalone, signals, `httpResource`), una sola página. Sus modelos son espejo de `server/src/models`: si cambias uno, cambia el otro.
 - `scripts/deploy-nas.ts`: `npm run deploy` compila el panel y copia el código al NAS.
 

@@ -4,6 +4,9 @@ export const DATA_FILE_NAMES = {
   codes: 'codes.json',
   cookies: 'cookies.json',
   notes: 'notes.json',
+  progress: 'progress.json',
+  income: 'income.json',
+  wishes: 'wishes.json',
   settings: 'settings.json',
   /** Identificador de dispositivo que se manda al canjear, como hace el navegador. Se genera una vez. */
   device: 'device.json',

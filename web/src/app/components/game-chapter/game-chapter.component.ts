@@ -7,11 +7,17 @@ import type { GameDashboard } from '../../models/game-dashboard.interface';
 import { GAME_THEMES } from '../../models/game-themes.const';
 import { VISIBLE_INACTIVE_CODES_LIMIT } from '../../models/visible-inactive-codes-limit.const';
 import { getTodayRewardIndex } from '../../utils/today-reward';
+import { EndgamePanelComponent } from '../endgame-panel/endgame-panel.component';
 import { EnergyPanelComponent } from '../energy-panel/energy-panel.component';
+import { IncomePanelComponent } from '../income-panel/income-panel.component';
+import { WishPanelComponent } from '../wish-panel/wish-panel.component';
 
-/** Un capítulo por juego: su energía, el calendario del mes (se va sellando al hacer scroll) y sus códigos. */
+/**
+ * Un capítulo por juego: su energía, contenido final, ingresos de la versión, tiradas, el calendario del mes (se va
+ * sellando al hacer scroll) y sus códigos.
+ */
 @Component({
-  imports: [DatePipe, EnergyPanelComponent],
+  imports: [DatePipe, EndgamePanelComponent, EnergyPanelComponent, IncomePanelComponent, WishPanelComponent],
   selector: 'app-game-chapter',
   styleUrl: './game-chapter.component.scss',
   templateUrl: './game-chapter.component.html',
@@ -22,6 +28,7 @@ export class GameChapterComponent {
 
   protected readonly codeStatusLabels = CODE_STATUS_LABELS;
   protected readonly theme = computed(() => GAME_THEMES[this.game().id]);
+  protected readonly pendingEventsCurrency = computed(() => (this.game().progress?.progress?.pendingEvents ?? []).reduce((total, event) => total + event.currency, 0));
   protected readonly summary = computed(() => this.game().checkIn?.summary ?? null);
   /** Algo del check-in de hoy que tienes que resolver tú. */
   protected readonly checkInProblem = computed(() => {

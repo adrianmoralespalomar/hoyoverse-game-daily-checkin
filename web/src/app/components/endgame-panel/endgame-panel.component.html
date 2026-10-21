@@ -1,0 +1,77 @@
+<div class="final">
+  <h3>Contenido final</h3>
+
+  @if (modes().length) {
+    <ul class="modos">
+      @for (mode of modes(); track mode.name) {
+        <li [class.completo]="mode.isComplete">
+          <span class="modo-nombre">
+            {{ mode.name }}
+            @if (mode.subtitle) {
+              <span class="modo-temporada">{{ mode.subtitle }}</span>
+            }
+          </span>
+          <span class="modo-progreso">{{ mode.progressLabel }}</span>
+          @if (mode.progress !== null) {
+            <div
+              class="barra"
+              aria-hidden="true">
+              <span
+                class="barra-relleno"
+                [style.width.%]="mode.progress * 100"></span>
+            </div>
+          }
+          <span class="modo-detalle">{{ mode.detailText }}</span>
+        </li>
+      }
+    </ul>
+    <a
+      class="guia"
+      [href]="theme().endgameGuideUrl"
+      target="_blank"
+      rel="noopener">{{ theme().endgameGuideName }}</a>
+  }
+
+  @if (pendingEvents().length) {
+    <div class="eventos">
+      <span class="eventos-titulo">
+        Eventos sin completar: hasta {{ pendingEventsCurrency() | number }} {{ theme().currencyName }}
+      </span>
+      <ul>
+        @for (event of pendingEvents(); track event.name) {
+          <li>
+            <span class="evento-nombre">{{ event.name }}</span>
+            <span class="evento-moneda">{{ event.currency | number }}</span>
+            @if (event.endsText) {
+              <span class="evento-fin">{{ event.endsText }}</span>
+            }
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
+  @if (progressState().error; as error) {
+    <span
+      class="final-error"
+      role="alert">{{ error }}</span>
+  }
+  @if (progressState().disabledReason; as disabledReason) {
+    <span class="final-pie">No se puede leer: {{ disabledReason }}.</span>
+  } @else {
+    <div class="final-pie">
+      <span>
+        @if (progress(); as progress) {
+          Leído el {{ progress.fetchedAt | date: 'd MMM, H:mm' }}. Se vuelve a leer cada 2 horas.
+        } @else {
+          Aún sin leer. Se lee cada 2 horas.
+        }
+      </span>
+      <button
+        type="button"
+        class="boton secundario"
+        [disabled]="isRefreshing()"
+        (click)="onRefreshProgressButtonClicked()">{{ isRefreshing() ? 'Leyendo…' : 'Leer ahora' }}</button>
+    </div>
+  }
+</div>
