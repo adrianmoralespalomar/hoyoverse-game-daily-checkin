@@ -29,6 +29,7 @@ export class GameChapterComponent {
   protected readonly codeStatusLabels = CODE_STATUS_LABELS;
   protected readonly theme = computed(() => GAME_THEMES[this.game().id]);
   protected readonly pendingEventsCurrency = computed(() => (this.game().progress?.progress?.pendingEvents ?? []).reduce((total, event) => total + event.currency, 0));
+  protected readonly versionName = computed(() => this.game().progress?.progress?.version?.name ?? null);
   protected readonly summary = computed(() => this.game().checkIn?.summary ?? null);
   /** Algo del check-in de hoy que tienes que resolver tú. */
   protected readonly checkInProblem = computed(() => {

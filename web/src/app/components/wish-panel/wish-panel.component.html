@@ -47,16 +47,24 @@
     </ul>
   }
 
+  @if (wishesState().summary; as summary) {
+    <span class="tiradas-estado">
+      Última importación: {{ summary.updatedAt | date: 'd MMM y, H:mm' }}{{ summary.updatedVersion ? ', en la versión ' + summary.updatedVersion : '' }}.
+    </span>
+    @if (isImportOutdated()) {
+      <span
+        class="tiradas-aviso"
+        role="status">
+        Aún no has importado en la {{ versionName() }}: tus tiradas de esta versión no están. Pega un enlace nuevo.
+      </span>
+    }
+  }
   @if (wishesState().isImporting) {
     <span
       class="tiradas-estado"
       role="status">Descargando el historial. La primera vez tarda unos minutos.</span>
   } @else if (wishesState().hasValidLink) {
     <span class="tiradas-estado">Enlace válido: las tiradas nuevas llegan solas cada hora durante 24 horas.</span>
-  } @else if (wishesState().summary; as summary) {
-    <span class="tiradas-estado">
-      Actualizado el {{ summary.updatedAt | date: 'd MMM, H:mm' }}. Para traer las nuevas, pega un enlace reciente.
-    </span>
   }
   @if (wishesState().error; as error) {
     <span

@@ -2,7 +2,12 @@
   class="capitulo"
   [style.--acento]="theme().accent">
   <header class="capitulo-cabecera">
-    <h2>{{ game().name }}</h2>
+    <h2>
+      {{ game().name }}
+      @if (versionName(); as versionName) {
+        <span class="capitulo-version">v{{ versionName }}</span>
+      }
+    </h2>
     @if (summary(); as summary) {
       <span class="capitulo-racha">
         {{ summary.totalSignDays }} de {{ summary.monthRewards.length }} días sellados este mes
@@ -43,6 +48,7 @@
     <app-wish-panel
       [gameId]="game().id"
       [theme]="theme()"
+      [versionName]="versionName()"
       [wishesState]="wishesState"/>
   }
 

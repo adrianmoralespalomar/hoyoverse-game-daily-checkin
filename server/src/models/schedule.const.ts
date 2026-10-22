@@ -11,6 +11,8 @@ export const SCHEDULE = {
   notesCron: '*/20 * * * *',
   /** Calendario, contenido final y diario: solo lectura, cada 2 horas (cambian poco). */
   progressCron: '41 */2 * * *',
+  /** Hojas de la comunidad con las tiradas F2P: cambian como mucho al empezar una versión. */
+  f2pSheetsCron: '23 5 * * *',
   /** Reintentos del check-in en un mismo día de HoYoLAB, solo ante errores de red. */
   maxCheckInAttemptsPerDay: 3,
   /** Al arrancar, espera antes de ponerse al día (el NAS puede estar aún levantando la red). */

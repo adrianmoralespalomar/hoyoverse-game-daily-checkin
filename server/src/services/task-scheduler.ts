@@ -5,6 +5,7 @@ import { CHECK_IN_TIME_PATTERN } from '../models/check-in-time-pattern.const.ts'
 import { SCHEDULE } from '../models/schedule.const.ts';
 import type { CheckInService } from './check-in-service.ts';
 import type { CodeRedemptionService } from './code-redemption-service.ts';
+import type { F2pSheetService } from './f2p-sheet-service.ts';
 import type { IncomeService } from './income-service.ts';
 import type { NotesService } from './notes-service.ts';
 import type { ProgressService } from './progress-service.ts';
@@ -17,6 +18,7 @@ import type { WishHistoryService } from './wish-history-service.ts';
  *   nuevas si el enlace del historial aún vale.
  * - Cada 20 minutos: resina y energía.
  * - Cada 2 horas: calendario, contenido final y diario de ingresos.
+ * - Cada día: hojas de la comunidad con las tiradas F2P de cada versión.
  * - Al arrancar: si hoy aún no se ha hecho el check-in (el NAS estaba apagado), lo hace, y busca códigos.
  */
 export class TaskScheduler {
@@ -27,11 +29,12 @@ export class TaskScheduler {
   #progress: ProgressService;
   #income: IncomeService;
   #wishes: WishHistoryService;
+  #f2pSheets: F2pSheetService;
   #checkInTask?: ScheduledTask;
   /** La lectura del calendario y el diario en curso: si se pide otra mientras tanto, se espera a esta. */
   #progressRefresh?: Promise<void>;
 
-  constructor(runner: ExclusiveRunner, checkIn: CheckInService, codes: CodeRedemptionService, notes: NotesService, progress: ProgressService, income: IncomeService, wishes: WishHistoryService) {
+  constructor(runner: ExclusiveRunner, checkIn: CheckInService, codes: CodeRedemptionService, notes: NotesService, progress: ProgressService, income: IncomeService, wishes: WishHistoryService, f2pSheets: F2pSheetService) {
     this.#runner = runner;
     this.#checkIn = checkIn;
     this.#codes = codes;
@@ -39,6 +42,7 @@ export class TaskScheduler {
     this.#progress = progress;
     this.#income = income;
     this.#wishes = wishes;
+    this.#f2pSheets = f2pSheets;
   }
 
   start(checkInTime: string): void {
@@ -47,11 +51,16 @@ export class TaskScheduler {
     // Las notas, el calendario y el diario solo leen: no hace falta esperar a que acaben el check-in o los canjes
     cron.schedule(SCHEDULE.notesCron, () => this.#refreshNotes());
     cron.schedule(SCHEDULE.progressCron, () => this.#refreshProgress());
+    cron.schedule(SCHEDULE.f2pSheetsCron, () => this.#refreshF2pSheets());
     setTimeout(() => this.#runStartupTasks(), SCHEDULE.startupDelayMs);
   }
 
   #refreshNotes(): void {
     this.#notes.refresh().catch((error: Error) => log('ERROR', `Notas fallidas: ${error.message}`));
+  }
+
+  #refreshF2pSheets(): void {
+    this.#f2pSheets.refresh().catch((error: Error) => log('ERROR', `Hojas F2P fallidas: ${error.message}`));
   }
 
   #refreshProgress(): void {
@@ -93,5 +102,6 @@ export class TaskScheduler {
     this.#runSafely(() => this.#codes.run());
     this.#refreshNotes();
     this.#refreshProgress();
+    this.#refreshF2pSheets();
   }
 }

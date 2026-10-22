@@ -1,12 +1,13 @@
-/** Lo que llevas ganado de moneda de tiradas en la versión actual, comparado con tu estimación F2P. */
+import type { VersionF2pTarget } from './version-f2p-target.interface.ts';
+
+/** Lo que llevas ganado de moneda de tiradas en la versión actual, comparado con lo que se espera. */
 export interface VersionIncome {
   versionName: string;
   total: number;
   /** De más a menos. */
   bySource: { source: string; amount: number }[];
-  /** Tiradas que da la versión a un F2P, según lo que hayas apuntado en el panel. */
-  f2pPulls: number | null;
-  /** Tiradas que te faltan por ganar respecto a `f2pPulls`. */
+  target: VersionF2pTarget | null;
+  /** Tiradas que te faltan por ganar respecto a `target.totalPulls`. */
   pullsLeft: number | null;
   /** Fecha del último mes leído del diario. */
   fetchedAt: string | null;

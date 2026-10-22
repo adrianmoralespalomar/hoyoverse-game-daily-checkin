@@ -1,6 +1,37 @@
 <div class="ingresos">
+  <div class="ingresos-cabecera">
+    <h3>Ingresos de la versión{{ income() ? ' ' + income()!.versionName : '' }}</h3>
+    <button
+      type="button"
+      class="info-boton"
+      aria-label="De dónde sale esta información"
+      [attr.aria-expanded]="isInfoOpen()"
+      (click)="onInfoButtonClicked()">i</button>
+  </div>
+
+  @if (isInfoOpen()) {
+    <div class="info-texto">
+      <span>
+        <strong>Lo que has ganado</strong> sale del diario de HoYoLAB, el mismo que ves dentro del juego (guarda los
+        últimos 3 meses). Incluye lo que ya has gastado y solo cuenta {{ theme().currencyName }}: los billetes o pases
+        que dan tiradas directamente no entran.
+      </span>
+      <span>
+        <strong>Lo que se espera de un F2P</strong> sale de
+        <a
+          [href]="theme().f2pSheetUrl"
+          target="_blank"
+          rel="noopener">{{ theme().f2pSheetName }}</a>,
+        que el NAS lee cada día. Como la hoja cuenta también esos billetes, «te faltan» es aproximado.
+      </span>
+      <span>
+        <strong>Lo de pago</strong> ({{ theme().monthlyCardName }}, {{ theme().battlePassName }}) solo se suma si lo
+        marcas: HoYoLAB no dice si lo tienes.
+      </span>
+    </div>
+  }
+
   @if (income(); as income) {
-    <h3>Ingresos de la versión {{ income.versionName }}</h3>
     <span class="ingresos-total">
       <strong>{{ income.total | number }}</strong> {{ theme().currencyName }}, unas {{ pulls() }} tiradas
     </span>
@@ -23,50 +54,85 @@
       </ul>
     }
 
-    <form
-      class="estimacion"
-      (submit)="$event.preventDefault(); onF2pPullsFormSubmitted()">
-      <label>
-        <span class="estimacion-titulo">Tiradas que da la {{ income.versionName }} a un F2P</span>
-        <input
-          type="number"
-          min="0"
-          max="1000"
-          inputmode="numeric"
-          placeholder="Según tu hoja"
-          [value]="f2pPullsDraft()"
-          (input)="onF2pPullsChanged($event)"/>
-      </label>
-      <button
-        type="submit"
-        class="boton secundario"
-        [disabled]="f2pPullsDraft() === (income.f2pPulls?.toString() ?? '')">Guardar</button>
-    </form>
-
-    @if (income.pullsLeft !== null) {
-      <span
-        class="estimacion-resultado"
-        [class.al-dia]="income.pullsLeft === 0">
-        @if (income.pullsLeft > 0) {
-          Te faltan unas {{ income.pullsLeft }} tiradas por ganar en esta versión.
-          @if (pendingEventsPulls()) {
-            Los eventos sin completar dan hasta {{ pendingEventsPulls() }} de ellas.
-          }
+    @if (target(); as target) {
+      <div class="esperado">
+        @if (target.sheetPulls !== null && target.sheetKind) {
+          <span class="esperado-hoja">
+            Un F2P gana unas <strong>{{ target.sheetPulls | number: '1.0-1' }}</strong> tiradas en la {{ income.versionName }}
+            <span class="esperado-origen">({{ sheetKindLabels[target.sheetKind] }})</span>
+          </span>
         } @else {
-          Ya has ganado lo que da la versión a un F2P.
+          <span class="esperado-hoja">
+            No he podido leer la hoja{{ target.sheetError ? ': ' + target.sheetError : '' }}. Puedes apuntar tú la cifra.
+          </span>
         }
-      </span>
+
+        <label class="extra">
+          <input
+            type="checkbox"
+            [checked]="target.monthlyCard.isEnabled"
+            (change)="onMonthlyCardChanged($event)"/>
+          <span>
+            Tengo {{ theme().monthlyCardName }}
+            <span class="extra-tiradas">+{{ target.monthlyCard.pulls | number: '1.0-1' }} tiradas</span>
+          </span>
+        </label>
+        <label class="extra">
+          <input
+            type="checkbox"
+            [checked]="target.battlePass.isEnabled"
+            (change)="onBattlePassChanged($event)"/>
+          <span>
+            Tengo el {{ theme().battlePassName }} de pago
+            <span class="extra-tiradas">+{{ target.battlePass.pulls | number: '1.0-1' }} tiradas</span>
+          </span>
+        </label>
+
+        <form
+          class="estimacion"
+          (submit)="$event.preventDefault(); onF2pPullsFormSubmitted()">
+          <label>
+            <span class="estimacion-titulo">Usar otra cifra de tiradas F2P para la {{ income.versionName }}</span>
+            <input
+              type="number"
+              min="0"
+              max="1000"
+              step="any"
+              inputmode="decimal"
+              [placeholder]="target.sheetPulls?.toString() ?? 'Tiradas'"
+              [value]="f2pPullsDraft()"
+              (input)="onF2pPullsChanged($event)"/>
+          </label>
+          <button
+            type="submit"
+            class="boton secundario"
+            [disabled]="f2pPullsDraft() === (target.manualPulls?.toString() ?? '')">Guardar</button>
+        </form>
+      </div>
+
+      @if (income.pullsLeft !== null && target.totalPulls !== null) {
+        <span
+          class="estimacion-resultado"
+          [class.al-dia]="income.pullsLeft === 0">
+          @if (income.pullsLeft > 0) {
+            Se esperan unas {{ target.totalPulls | number: '1.0-1' }} tiradas y te faltan unas {{ income.pullsLeft }} por ganar.
+            @if (pendingEventsPulls()) {
+              Los eventos sin completar dan hasta {{ pendingEventsPulls() }} de ellas.
+            }
+          } @else {
+            Ya has ganado lo que se espera en esta versión ({{ target.totalPulls | number: '1.0-1' }} tiradas).
+          }
+        </span>
+      }
     }
+
     @if (saveError(); as saveError) {
       <span
         class="ingresos-error"
         role="alert">{{ saveError }}</span>
     }
-    <span class="ingresos-pie">
-      Sale del diario de HoYoLAB (incluye lo que ya has gastado). Leído el {{ income.fetchedAt | date: 'd MMM, H:mm' }}.
-    </span>
+    <span class="ingresos-pie">Diario leído el {{ income.fetchedAt | date: 'd MMM, H:mm' }}.</span>
   } @else {
-    <h3>Ingresos de la versión</h3>
     <span class="ingresos-pie">
       @if (incomeState().disabledReason; as disabledReason) {
         No se puede leer el diario: {{ disabledReason }}.

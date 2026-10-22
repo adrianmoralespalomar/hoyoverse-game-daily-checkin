@@ -19,6 +19,8 @@ export class WishPanelComponent {
 
   readonly gameId = input.required<GameId>();
   readonly theme = input.required<GameTheme>();
+  /** Versión actual del juego, si ya se ha leído el calendario. */
+  readonly versionName = input.required<string | null>();
   readonly wishesState = input.required<NonNullable<GameDashboard['wishes']>>();
 
   protected readonly importError = signal<string | null>(null);
@@ -26,6 +28,11 @@ export class WishPanelComponent {
   protected readonly linkDraft = signal('');
   protected readonly bannerKindLabels = WISH_BANNER_KIND_LABELS;
   protected readonly scriptCommand = computed(() => `powershell -ExecutionPolicy Bypass -File ${WISH_LINK_SCRIPT_PATH} -Game ${this.gameId()}`);
+  /** La última importación fue en otra versión: lo de esta versión aún no está. */
+  protected readonly isImportOutdated = computed(() => {
+    const importedVersion = this.wishesState().summary?.updatedVersion;
+    return !!importedVersion && !!this.versionName() && importedVersion !== this.versionName();
+  });
   protected readonly banners = computed(() => (this.wishesState().summary?.banners ?? []).map(banner => ({
     ...banner,
     percent: Math.min(100, (banner.pity / banner.hardPity) * 100),

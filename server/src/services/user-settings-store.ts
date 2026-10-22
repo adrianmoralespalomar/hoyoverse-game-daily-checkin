@@ -1,7 +1,9 @@
 import { readDataFile, writeDataFile } from '../core/data-file-store.ts';
 import { CHECK_IN_TIME_PATTERN } from '../models/check-in-time-pattern.const.ts';
 import { DATA_FILE_NAMES } from '../models/data-file-names.const.ts';
+import { withDefaultExtras } from '../core/version-f2p-target.ts';
 import type { GameId } from '../models/game-id.type.ts';
+import type { IncomeExtras } from '../models/income-extras.interface.ts';
 import { SCHEDULE } from '../models/schedule.const.ts';
 import type { UserSettings } from '../models/user-settings.interface.ts';
 
@@ -9,6 +11,7 @@ export class UserSettingsStore {
   #settings: UserSettings = {
     checkInTime: SCHEDULE.defaultCheckInTime,
     f2pPullsByVersion: {},
+    incomeExtras: {},
     ...readDataFile<Partial<UserSettings>>(DATA_FILE_NAMES.settings, {}),
   };
 
@@ -22,6 +25,17 @@ export class UserSettingsStore {
     this.#settings.checkInTime = checkInTime;
     writeDataFile(DATA_FILE_NAMES.settings, this.#settings);
     return this.get();
+  }
+
+  getIncomeExtras(gameId: GameId): IncomeExtras {
+    return withDefaultExtras(gameId, this.#settings.incomeExtras[gameId]);
+  }
+
+  /** Lanza si alguno no es verdadero o falso. */
+  saveIncomeExtras(gameId: GameId, monthlyCard: unknown, battlePass: unknown): void {
+    if (typeof monthlyCard !== 'boolean' || typeof battlePass !== 'boolean') throw new Error('Marca o desmarca cada opción');
+    this.#settings.incomeExtras[gameId] = { monthlyCard, battlePass };
+    writeDataFile(DATA_FILE_NAMES.settings, this.#settings);
   }
 
   getF2pPulls(gameId: GameId, version: string | undefined): number | null {

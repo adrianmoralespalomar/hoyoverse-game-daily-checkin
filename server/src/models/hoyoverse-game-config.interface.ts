@@ -35,6 +35,8 @@ export interface HoyoverseGameConfig {
     /** `type` del detalle que corresponde a la moneda de tiradas. */
     currencyType: string;
   };
+  /** Hoja de la comunidad con las tiradas F2P de cada versión, en CSV público. */
+  f2pSheetCsvUrl: string;
   /** Historial de tiradas. Va con la `authkey` del enlace que abre el juego, sin cookies. */
   gachaLog: {
     url: string;

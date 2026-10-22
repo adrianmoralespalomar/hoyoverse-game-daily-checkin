@@ -21,6 +21,7 @@ export const HOYOVERSE_GAMES: HoyoverseGameConfig[] = [
     recordApiUrl: 'https://sg-public-api.hoyolab.com/event/game_record/genshin/api',
     currencyItemId: 201,
     ledger: { url: 'https://sg-hk4e-api.hoyolab.com/event/ysledgeros', monthFormat: 'month', currencyType: '1' },
+    f2pSheetCsvUrl: 'https://docs.google.com/spreadsheets/d/1l9HPu2cAzTckdXtr7u-7D8NSKzZNUqOuvbmxERFZ_6w/export?format=csv&gid=955728278',
     gachaLog: {
       url: 'https://public-operation-hk4e-sg.hoyoverse.com/gacha_info/api/getGachaLog',
       linkPathPattern: /\/(genshin|hk4e)/,
@@ -56,6 +57,7 @@ export const HOYOVERSE_GAMES: HoyoverseGameConfig[] = [
     recordApiUrl: 'https://bbs-api-os.hoyolab.com/game_record/hkrpg/api',
     currencyItemId: 1,
     ledger: { url: 'https://sg-public-api.hoyolab.com/event/srledger', monthFormat: 'year-month', currencyType: '1' },
+    f2pSheetCsvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRIWjzFwAZZoBvKw2oiNaVpppI9atoV0wxuOjulKRJECrg_BN404d7LoKlHp8RMX8hegDr4b8jlHjYy/pub?gid=377500512&single=true&output=csv',
     gachaLog: {
       url: 'https://public-operation-hkrpg-sg.hoyoverse.com/common/gacha_record/api/getGachaLog',
       linkPathPattern: /\/hkrpg/,
@@ -91,6 +93,7 @@ export const HOYOVERSE_GAMES: HoyoverseGameConfig[] = [
     // ZZZ no lista recompensas por objeto en su calendario: dice las películas de cada evento directamente
     currencyItemId: 0,
     ledger: { url: 'https://sg-public-api.hoyolab.com/event/nap_ledger', monthFormat: 'year-month', currencyType: 'PolychromesData' },
+    f2pSheetCsvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTiSx8OSyx-BZktnpT-fh_pQHjjkD8q3sp3Csy2aOI-8CV_QroqxzhhNjiCZNV4IdzhyK3xbipZn9WD/pub?gid=377500512&single=true&output=csv',
     gachaLog: {
       url: 'https://public-operation-nap-sg.hoyoverse.com/common/gacha_record/api/getGachaLog',
       linkPathPattern: /\/nap/,

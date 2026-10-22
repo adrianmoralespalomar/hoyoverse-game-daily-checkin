@@ -19,9 +19,11 @@ export class WishHistoryService {
   #authkeys = new Map<GameId, { authkey: string; savedAt: number }>();
   #importingGameIds = new Set<GameId>();
   #games: GameModule[];
+  #getVersionName: (gameId: GameId) => string | null;
 
-  constructor(games: GameModule[]) {
+  constructor(games: GameModule[], getVersionName: (gameId: GameId) => string | null) {
     this.#games = games.filter(game => game.wishHistory);
+    this.#getVersionName = getVersionName;
   }
 
   /** Reconoce el juego y guarda la `authkey`. Lanza si el enlace no sirve. La descarga va aparte (`importWishes`). */
@@ -44,7 +46,7 @@ export class WishHistoryService {
     try {
       const newRecords = await game.wishHistory!.fetchNewWishes(saved.authkey, new Set(state.records.map(record => record.id)));
       const records = [...state.records, ...newRecords].sort((a, b) => a.id.length - b.id.length || a.id.localeCompare(b.id));
-      this.#states[game.id] = { records, updatedAt: new Date().toISOString() };
+      this.#states[game.id] = { records, updatedAt: new Date().toISOString(), updatedVersion: this.#getVersionName(game.id) ?? undefined };
       log('INFO', `${game.name}: ${newRecords.length} tiradas nuevas en el historial`);
     } catch (error) {
       this.#states[game.id] = { ...state, error: (error as Error).message, errorAt: new Date().toISOString() };
@@ -68,12 +70,12 @@ export class WishHistoryService {
 
   getView(game: GameModule, version: GameVersion | null): GameDashboard['wishes'] {
     if (!game.wishHistory) return null;
-    const { records = [], updatedAt, error } = this.#states[game.id] ?? {};
+    const { records = [], updatedAt, updatedVersion, error } = this.#states[game.id] ?? {};
     return {
       isImporting: this.#importingGameIds.has(game.id),
       hasValidLink: this.#authkeys.has(game.id),
       error,
-      summary: updatedAt ? { updatedAt, totalPulls: records.length, banners: summarizeWishBanners(records, game.wishHistory, version) } : undefined,
+      summary: updatedAt ? { updatedAt, updatedVersion: updatedVersion ?? null, totalPulls: records.length, banners: summarizeWishBanners(records, game.wishHistory, version) } : undefined,
     };
   }
 }

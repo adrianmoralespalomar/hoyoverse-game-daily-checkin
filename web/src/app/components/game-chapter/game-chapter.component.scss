@@ -23,6 +23,16 @@ section.capitulo {
       font-size: clamp(3rem, 6.5vw, 5.6rem);
       font-variation-settings: 'opsz' 96, 'wdth' 75;
       text-wrap: balance;
+
+      span.capitulo-version {
+        color: var(--apagado);
+        font-size: 0.28em;
+        font-variation-settings: 'opsz' 14, 'wdth' 100;
+        font-weight: 500;
+        letter-spacing: 0;
+        margin-left: 0.4em;
+        vertical-align: 0.15em;
+      }
     }
 
     span.capitulo-racha {

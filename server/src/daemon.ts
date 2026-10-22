@@ -8,6 +8,7 @@ import { ExclusiveRunner } from './core/exclusive-runner.ts';
 import { getHoyolabDayKey } from './core/hoyolab-day.ts';
 import { log } from './core/log.ts';
 import { createSessionCookie, hasAccess, isAuthRequired, isCorrectWebPassword } from './core/request-access.ts';
+import { HOYOVERSE_GAMES } from './models/hoyoverse-games.const.ts';
 import { createGameModules } from './games/game-registry.ts';
 import { AUTH_SESSION } from './models/auth-session.const.ts';
 import { DAEMON_HOST, DAEMON_PORT } from './models/daemon-address.const.ts';
@@ -16,6 +17,7 @@ import { DEPLOY_ID_FILE_PATH, WEB_BUILD_DIRECTORY } from './models/project-paths
 import { PUBLIC_API_PATHS } from './models/public-api-paths.const.ts';
 import { CheckInService } from './services/check-in-service.ts';
 import { CodeRedemptionService } from './services/code-redemption-service.ts';
+import { F2pSheetService } from './services/f2p-sheet-service.ts';
 import { CookieStateStore } from './services/cookie-state-store.ts';
 import { IncomeService } from './services/income-service.ts';
 import { NotesService } from './services/notes-service.ts';
@@ -35,9 +37,10 @@ const runner = new ExclusiveRunner();
 const notes = new NotesService(games, cookies);
 const progress = new ProgressService(games, cookies);
 const income = new IncomeService(games, cookies);
-const wishes = new WishHistoryService(games);
+const f2pSheets = new F2pSheetService(HOYOVERSE_GAMES.filter(({ id }) => games.some(game => game.id === id)));
+const wishes = new WishHistoryService(games, gameId => progress.getVersion(gameId)?.name ?? null);
 const userSettings = new UserSettingsStore();
-const scheduler = new TaskScheduler(runner, checkIn, codes, notes, progress, income, wishes);
+const scheduler = new TaskScheduler(runner, checkIn, codes, notes, progress, income, wishes, f2pSheets);
 scheduler.start(userSettings.get().checkInTime);
 
 const app = Fastify();
@@ -78,7 +81,7 @@ app.get('/api/dashboard', async (): Promise<Dashboard> => ({
       codes: codes.getView(game),
       notes: notes.getView(game),
       progress: progress.getView(game),
-      income: income.getView(game, version, userSettings.getF2pPulls(game.id, version?.name)),
+      income: income.getView(game, version, version && f2pSheets.buildTarget(game.id, version, userSettings.getF2pPulls(game.id, version.name), userSettings.getIncomeExtras(game.id))),
       wishes: wishes.getView(game, version),
     };
   }),
@@ -106,6 +109,13 @@ app.put<{ Body: { gameId?: unknown; version?: unknown; pulls?: unknown } }>('/ap
   const game = games.find(({ id }) => id === body?.gameId);
   if (!game) throw new Error('Juego desconocido');
   userSettings.saveF2pPulls(game.id, body?.version, body?.pulls);
+  return { ok: true };
+});
+
+app.put<{ Body: { gameId?: unknown; monthlyCard?: unknown; battlePass?: unknown } }>('/api/settings/income-extras', async ({ body }) => {
+  const game = games.find(({ id }) => id === body?.gameId);
+  if (!game) throw new Error('Juego desconocido');
+  userSettings.saveIncomeExtras(game.id, body?.monthlyCard, body?.battlePass);
   return { ok: true };
 });
 

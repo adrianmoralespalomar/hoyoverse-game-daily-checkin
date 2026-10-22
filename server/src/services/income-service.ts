@@ -9,6 +9,7 @@ import type { GameId } from '../models/game-id.type.ts';
 import type { GameIncomeState } from '../models/game-income-state.interface.ts';
 import type { GameModule } from '../models/game-module.interface.ts';
 import type { GameVersion } from '../models/game-version.interface.ts';
+import type { VersionF2pTarget } from '../models/version-f2p-target.interface.ts';
 import { REQUEST_PACING } from '../models/request-pacing.const.ts';
 import type { CookieStateStore } from './cookie-state-store.ts';
 
@@ -52,7 +53,7 @@ export class IncomeService {
     writeDataFile(DATA_FILE_NAMES.income, this.#states);
   }
 
-  getView(game: GameModule, version: GameVersion | null, f2pPulls: number | null): GameDashboard['income'] {
+  getView(game: GameModule, version: GameVersion | null, target: VersionF2pTarget | null): GameDashboard['income'] {
     if (!game.fetchIncomeMonth) return game.incomeDisabledReason ? { disabledReason: game.incomeDisabledReason } : null;
     const { months = {}, error } = this.#states[game.id] ?? {};
     if (!version || !Object.keys(months).length) return { error };
@@ -68,8 +69,8 @@ export class IncomeService {
         versionName: version.name,
         total,
         bySource: [...amountsBySource].map(([source, amount]) => ({ source, amount })).sort((a, b) => b.amount - a.amount),
-        f2pPulls,
-        pullsLeft: f2pPulls === null ? null : Math.max(0, Math.ceil(f2pPulls - total / GAME_CALENDAR.currencyPerPull)),
+        target,
+        pullsLeft: target?.totalPulls == null ? null : Math.max(0, Math.ceil(target.totalPulls - total / GAME_CALENDAR.currencyPerPull)),
         fetchedAt: fetchedDates.at(-1) ?? null,
       },
     };

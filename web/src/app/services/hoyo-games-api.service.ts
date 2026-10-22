@@ -44,6 +44,11 @@ export class HoyoGamesApiService {
     return this.post('/api/settings/f2p-pulls', { gameId, version, pulls }, 'PUT');
   }
 
+  /** Lo de pago que tienes: suma sus tiradas a lo que se espera en la versión. */
+  saveIncomeExtras(gameId: GameId, monthlyCard: boolean, battlePass: boolean): Promise<void> {
+    return this.post('/api/settings/income-extras', { gameId, monthlyCard, battlePass }, 'PUT');
+  }
+
   /** El NAS reconoce el juego por el enlace y descarga el historial aparte (el panel sigue `isImporting`). */
   importWishes(link: string): Promise<void> {
     return this.post('/api/wishes/import', { link });
