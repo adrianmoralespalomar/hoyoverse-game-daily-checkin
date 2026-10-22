@@ -1,4 +1,5 @@
 import type { WishBannerKind } from './wish-banner-kind.type.ts';
+import type { WishTopPull } from './wish-top-pull.interface.ts';
 
 export interface WishBannerSummary {
   kind: WishBannerKind;
@@ -7,8 +8,8 @@ export interface WishBannerSummary {
   hardPity: number;
   /** Solo en el de personaje: el próximo 5★ es el destacado seguro (perdiste el último 50/50). */
   isGuaranteed: boolean | null;
-  /** Los últimos 5★, el más reciente primero. `wonFiftyFifty` es `null` si iba garantizado o no aplica. */
-  lastTopPulls: { name: string; pity: number; at: string; wonFiftyFifty: boolean | null }[];
+  /** Todos los 5★ del historial, el más reciente primero. */
+  topPulls: WishTopPull[];
   totalPulls: number;
   pullsThisVersion: number;
 }

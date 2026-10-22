@@ -108,6 +108,56 @@ section.control {
     }
   }
 
+  div.avisos-reglas {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+
+    h3 {
+      font-size: 1.4rem;
+    }
+
+    label {
+      column-gap: 0.6rem;
+      display: grid;
+      grid-template-columns: auto 1fr;
+
+      span.avisos-regla-detalle {
+        color: var(--apagado);
+        font-size: 0.88rem;
+        grid-column: 2;
+      }
+    }
+
+    div.avisos-movil {
+      display: grid;
+      gap: 0.5rem;
+      justify-items: start;
+      margin-top: 0.75rem;
+
+      h4 {
+        font-size: 1.1rem;
+      }
+
+      span.avisos-regla-detalle {
+        color: var(--apagado);
+        font-size: 0.88rem;
+      }
+
+      span.acciones-error {
+        color: var(--error);
+        display: block;
+        font-size: 0.95rem;
+      }
+
+      div.avisos-movil-botones {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 0.75rem;
+      }
+    }
+  }
+
   .acciones {
     align-items: center;
     display: flex;

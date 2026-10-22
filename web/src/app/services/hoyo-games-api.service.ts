@@ -49,6 +49,34 @@ export class HoyoGamesApiService {
     return this.post('/api/settings/income-extras', { gameId, monthlyCard, battlePass }, 'PUT');
   }
 
+  /** Hora a la que te despiertas: con ella se calcula la energía que se pierde mientras duermes. */
+  saveWakeUpTime(wakeUpTime: string): Promise<void> {
+    return this.post('/api/settings/wake-up-time', { wakeUpTime }, 'PUT');
+  }
+
+  /** Enciende o apaga una regla de avisos. */
+  saveAlertRuleEnabled(ruleId: string, isEnabled: boolean): Promise<void> {
+    return this.post('/api/settings/alert-rules', { ruleId, isEnabled }, 'PUT');
+  }
+
+  /** Clave con la que el NAS se identifica ante el servicio de notificaciones. */
+  async getPushPublicKey(): Promise<string> {
+    return (await firstValueFrom(this.http.get<{ publicKey: string }>('/api/push/public-key'))).publicKey;
+  }
+
+  /** Da de alta este dispositivo para recibir notificaciones. */
+  savePushSubscription(subscription: PushSubscriptionJSON): Promise<void> {
+    return this.post('/api/push/subscribe', { subscription });
+  }
+
+  removePushSubscription(endpoint: string): Promise<void> {
+    return this.post('/api/push/unsubscribe', { endpoint });
+  }
+
+  sendTestPush(): Promise<void> {
+    return this.post('/api/push/test', {});
+  }
+
   /** El NAS reconoce el juego por el enlace y descarga el historial aparte (el panel sigue `isImporting`). */
   importWishes(link: string): Promise<void> {
     return this.post('/api/wishes/import', { link });

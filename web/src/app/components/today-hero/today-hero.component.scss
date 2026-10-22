@@ -55,11 +55,21 @@ a.sello {
   }
 
   span.sello-juego {
+    align-items: center;
+    display: flex;
     font-size: 1.6rem;
     font-variation-settings: 'opsz' 72, 'wdth' 80;
     font-weight: 750;
+    gap: 0.5rem;
     letter-spacing: -0.02em;
     margin-top: 1rem;
+
+    img {
+      border-radius: 7px;
+      height: 1.6rem;
+      margin-block: 0;
+      width: 1.6rem;
+    }
   }
 
   img {

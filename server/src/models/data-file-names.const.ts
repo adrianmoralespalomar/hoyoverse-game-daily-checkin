@@ -8,6 +8,9 @@ export const DATA_FILE_NAMES = {
   income: 'income.json',
   f2pSheets: 'f2p-sheets.json',
   wishes: 'wishes.json',
+  characterIcons: 'character-icons.json',
+  livestreams: 'livestreams.json',
+  push: 'push.json',
   settings: 'settings.json',
   /** Identificador de dispositivo que se manda al canjear, como hace el navegador. Se genera una vez. */
   device: 'device.json',

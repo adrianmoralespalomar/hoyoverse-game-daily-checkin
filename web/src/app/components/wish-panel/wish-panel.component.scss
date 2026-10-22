@@ -62,33 +62,72 @@
     ol.ultimos {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.35rem;
+      gap: 0.6rem 0.5rem;
       grid-column: 1 / -1;
       list-style: none;
-      margin: 0.2rem 0 0;
+      margin: 0.3rem 0 0;
       padding: 0;
 
       li {
-        align-items: baseline;
-        background: var(--superficie);
-        border-radius: 999px;
-        display: flex;
-        font-size: 0.82rem;
-        gap: 0.35rem;
-        padding: 0.2rem 0.7rem;
+        --color-resultado: var(--apagado);
+        align-content: start;
+        display: grid;
+        gap: 0.25rem;
+        justify-items: center;
+        width: 3.8rem;
 
-        span.ultimo-pity {
-          color: var(--acento);
-          font-variant-numeric: tabular-nums;
-          font-weight: 650;
+        &[data-resultado='won'] {
+          --color-resultado: #6fd68f;
         }
 
-        span.ultimo-nota {
+        &[data-resultado='lost'] {
+          --color-resultado: var(--error);
+        }
+
+        span.ultimo-circulo {
+          align-items: center;
+          background: color-mix(in oklab, var(--color-resultado) 22%, var(--superficie));
+          border-radius: 50%;
+          box-shadow: inset 0 0 0 2px var(--color-resultado);
+          display: flex;
+          font-size: 0.95rem;
+          font-weight: 700;
+          height: 2.9rem;
+          justify-content: center;
+          position: relative;
+          width: 2.9rem;
+
+          img {
+            border-radius: 50%;
+            height: 100%;
+            object-fit: cover;
+            width: 100%;
+          }
+
+          span.ultimo-pity {
+            background: var(--fondo);
+            border-radius: 999px;
+            bottom: -0.35rem;
+            box-shadow: inset 0 0 0 1px var(--color-resultado);
+            color: var(--tinta);
+            font-size: 0.7rem;
+            font-variant-numeric: tabular-nums;
+            padding: 0.05rem 0.4rem;
+            position: absolute;
+          }
+        }
+
+        span.ultimo-nombre {
           color: var(--apagado);
-        }
-
-        &.perdido {
-          box-shadow: inset 0 0 0 1px var(--linea);
+          display: block;
+          font-size: 0.7rem;
+          line-height: 1.15;
+          margin-top: 0.2rem;
+          max-width: 100%;
+          overflow: hidden;
+          text-align: center;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
       }
     }
@@ -161,14 +200,30 @@
       padding-left: 1.25rem;
     }
 
-    code {
-      background: var(--superficie);
-      border-radius: 6px;
-      color: var(--tinta);
-      display: block;
+    div.como-comando {
+      align-items: start;
+      display: flex;
+      gap: 0.5rem;
       margin-top: 0.35rem;
-      overflow-wrap: anywhere;
-      padding: 0.5rem 0.7rem;
+
+      code {
+        background: var(--superficie);
+        border-radius: 6px;
+        color: var(--tinta);
+        flex: 1;
+        overflow-wrap: anywhere;
+        padding: 0.5rem 0.7rem;
+      }
+
+      button {
+        background: var(--acento);
+        border: 0;
+        border-radius: 6px;
+        color: var(--fondo);
+        cursor: pointer;
+        font-weight: 650;
+        padding: 0.5rem 0.9rem;
+      }
     }
   }
 }

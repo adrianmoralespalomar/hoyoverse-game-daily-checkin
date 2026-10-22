@@ -3,6 +3,12 @@
   [style.--acento]="theme().accent">
   <header class="capitulo-cabecera">
     <h2>
+      <img
+        class="capitulo-logo"
+        alt=""
+        width="64"
+        height="64"
+        [src]="theme().logoUrl"/>
       {{ game().name }}
       @if (versionName(); as versionName) {
         <span class="capitulo-version">v{{ versionName }}</span>
@@ -35,6 +41,8 @@
       [progressState]="progressState"
       [theme]="theme()"/>
   }
+
+  <app-banners-panel [banners]="banners()"/>
 
   @if (game().income; as incomeState) {
     <app-income-panel

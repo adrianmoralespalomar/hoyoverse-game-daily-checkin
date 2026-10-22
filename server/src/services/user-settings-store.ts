@@ -10,8 +10,10 @@ import type { UserSettings } from '../models/user-settings.interface.ts';
 export class UserSettingsStore {
   #settings: UserSettings = {
     checkInTime: SCHEDULE.defaultCheckInTime,
+    wakeUpTime: SCHEDULE.defaultWakeUpTime,
     f2pPullsByVersion: {},
     incomeExtras: {},
+    disabledAlertRuleIds: [],
     ...readDataFile<Partial<UserSettings>>(DATA_FILE_NAMES.settings, {}),
   };
 
@@ -25,6 +27,21 @@ export class UserSettingsStore {
     this.#settings.checkInTime = checkInTime;
     writeDataFile(DATA_FILE_NAMES.settings, this.#settings);
     return this.get();
+  }
+
+  /** Lanza si `isEnabled` no es verdadero o falso. */
+  saveAlertRuleEnabled(ruleId: string, isEnabled: unknown): void {
+    if (typeof isEnabled !== 'boolean') throw new Error('Enciende o apaga el aviso');
+    const otherDisabledRuleIds = this.#settings.disabledAlertRuleIds.filter(id => id !== ruleId);
+    this.#settings.disabledAlertRuleIds = isEnabled ? otherDisabledRuleIds : [...otherDisabledRuleIds, ruleId];
+    writeDataFile(DATA_FILE_NAMES.settings, this.#settings);
+  }
+
+  /** Lanza si la hora no es `HH:mm` (el panel enseña el mensaje). */
+  saveWakeUpTime(wakeUpTime: unknown): void {
+    if (typeof wakeUpTime !== 'string' || !CHECK_IN_TIME_PATTERN.test(wakeUpTime)) throw new Error('La hora tiene que ser HH:mm, por ejemplo 07:00');
+    this.#settings.wakeUpTime = wakeUpTime;
+    writeDataFile(DATA_FILE_NAMES.settings, this.#settings);
   }
 
   getIncomeExtras(gameId: GameId): IncomeExtras {

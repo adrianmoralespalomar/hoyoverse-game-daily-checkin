@@ -58,6 +58,75 @@
     id="guia-cookies"
     [isOpen]="hasCookieProblem()"/>
 
+  <div class="avisos-reglas">
+    <h3>Avisos</h3>
+    <form
+      class="horario"
+      (submit)="$event.preventDefault(); onWakeUpTimeFormSubmitted()">
+      <label>
+        <span class="horario-titulo">Hora a la que te despiertas</span>
+        <input
+          type="time"
+          required
+          [value]="wakeUpTimeDraft()"
+          (input)="onWakeUpTimeChanged($event)"/>
+      </label>
+      <button
+        type="submit"
+        class="boton secundario"
+        [disabled]="!wakeUpTimeDraft() || wakeUpTimeDraft() === dashboard().wakeUpTimeLabel">Guardar hora</button>
+    </form>
+    @for (rule of dashboard().alertRules; track rule.id) {
+      <label>
+        <input
+          type="checkbox"
+          [checked]="rule.isEnabled"
+          (change)="onAlertRuleChanged(rule.id, $event)"/>
+        <span class="avisos-regla-nombre">{{ rule.label }}</span>
+        <span class="avisos-regla-detalle">{{ rule.description }}</span>
+      </label>
+    }
+    <button
+      type="button"
+      class="boton secundario"
+      (click)="onTestAlertButtonClicked()">Probar un aviso</button>
+
+    <div class="avisos-movil">
+      <h4>Notificaciones en este dispositivo</h4>
+      @if (!pushNotificationService.isSupported) {
+        <span class="avisos-regla-detalle">
+          Para recibirlas, abre el panel desde la app instalada o por HTTPS: sin eso el navegador no las permite.
+        </span>
+      } @else if (pushNotificationService.isEnabled()) {
+        <span class="avisos-regla-detalle">Activadas: los avisos te llegan aunque la app esté cerrada.</span>
+        <div class="avisos-movil-botones">
+          <button
+            type="button"
+            class="boton secundario"
+            [disabled]="pushNotificationService.isWorking()"
+            (click)="onTestPushButtonClicked()">Mandar una de prueba</button>
+          <button
+            type="button"
+            class="boton secundario"
+            [disabled]="pushNotificationService.isWorking()"
+            (click)="onDisablePushButtonClicked()">Desactivar</button>
+        </div>
+      } @else {
+        <span class="avisos-regla-detalle">Recibe los avisos como notificación del móvil, aunque tengas la app cerrada.</span>
+        <button
+          type="button"
+          class="boton"
+          [disabled]="pushNotificationService.isWorking()"
+          (click)="onEnablePushButtonClicked()">Activar notificaciones</button>
+      }
+      @if (pushNotificationService.error(); as pushError) {
+        <span
+          class="acciones-error"
+          role="alert">{{ pushError }}</span>
+      }
+    </div>
+  </div>
+
   <div class="acciones">
     <button
       type="button"

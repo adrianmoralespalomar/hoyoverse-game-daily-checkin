@@ -4,6 +4,7 @@ import type { GameTheme } from './game-theme.interface';
 export const GAME_THEMES: Record<GameId, GameTheme> = {
   gi: {
     accent: '#e8c26a',
+    logoUrl: 'juegos/gi.png',
     shortName: 'Genshin',
     currencyName: 'protogemas',
     topRankLabel: '5★',
@@ -19,6 +20,7 @@ export const GAME_THEMES: Record<GameId, GameTheme> = {
   },
   hsr: {
     accent: '#9db0ff',
+    logoUrl: 'juegos/hsr.png',
     shortName: 'Star Rail',
     currencyName: 'jade estelar',
     topRankLabel: '5★',
@@ -33,6 +35,7 @@ export const GAME_THEMES: Record<GameId, GameTheme> = {
   },
   zzz: {
     accent: '#ff8a3d',
+    logoUrl: 'juegos/zzz.png',
     shortName: 'Zenless',
     currencyName: 'películas',
     topRankLabel: 'S',

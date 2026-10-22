@@ -24,6 +24,14 @@ section.capitulo {
       font-variation-settings: 'opsz' 96, 'wdth' 75;
       text-wrap: balance;
 
+      img.capitulo-logo {
+        border-radius: 22%;
+        display: block;
+        height: 0.9em;
+        margin-bottom: 0.2em;
+        width: 0.9em;
+      }
+
       span.capitulo-version {
         color: var(--apagado);
         font-size: 0.28em;
@@ -168,7 +176,8 @@ ol.calendario {
       padding: 0.15rem 0.7rem;
       white-space: nowrap;
 
-      &[data-estado='redeemed'] {
+      &[data-estado='redeemed'],
+      &[data-estado='already_redeemed'] {
         background: var(--acento);
         box-shadow: none;
         color: var(--fondo);

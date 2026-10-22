@@ -1,0 +1,73 @@
+ul.avisos {
+  bottom: 1rem;
+  display: grid;
+  gap: 0.6rem;
+  list-style: none;
+  margin: 0;
+  max-width: min(24rem, calc(100vw - 2rem));
+  padding: 0;
+  position: fixed;
+  right: 1rem;
+  z-index: 30;
+
+  li {
+    --color-aviso: var(--tinta);
+    background: color-mix(in oklab, var(--color-aviso) 22%, var(--superficie));
+    border-radius: var(--radio-pequeno);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-aviso) 55%, transparent), 0 10px 30px rgb(0 0 0 / 0.4);
+    column-gap: 0.8rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    padding: 0.85rem 2.4rem 0.85rem 0.85rem;
+    position: relative;
+
+    > :not(img.aviso-logo) {
+      grid-column: 2;
+    }
+
+    img.aviso-logo {
+      border-radius: 10px;
+      grid-column: 1;
+      grid-row: 1 / span 3;
+      height: 2.5rem;
+      width: 2.5rem;
+    }
+
+    &[data-gravedad='error'] {
+      box-shadow: inset 0 0 0 2px var(--color-aviso), 0 10px 30px rgb(0 0 0 / 0.4);
+    }
+
+    span.aviso-titulo {
+      color: var(--tinta);
+      display: block;
+      font-weight: 700;
+    }
+
+    span.aviso-mensaje {
+      display: block;
+      font-size: 0.92rem;
+    }
+
+    a.aviso-enlace {
+      color: var(--color-aviso);
+      font-size: 0.9rem;
+    }
+
+    button.aviso-cerrar {
+      background: none;
+      border: 0;
+      color: var(--apagado);
+      cursor: pointer;
+      font-size: 1.4rem;
+      line-height: 1;
+      padding: 0.2rem 0.5rem;
+      position: absolute;
+      right: 0.2rem;
+      top: 0.2rem;
+
+      &:hover {
+        color: var(--tinta);
+      }
+    }
+  }
+}

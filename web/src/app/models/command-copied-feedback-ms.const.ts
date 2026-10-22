@@ -1,0 +1,1 @@
+export const COMMAND_COPIED_FEEDBACK_MS = 2000;

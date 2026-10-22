@@ -20,10 +20,12 @@ export class WishHistoryService {
   #importingGameIds = new Set<GameId>();
   #games: GameModule[];
   #getVersionName: (gameId: GameId) => string | null;
+  #getIconUrl: (gameId: GameId, name: string) => string | null;
 
-  constructor(games: GameModule[], getVersionName: (gameId: GameId) => string | null) {
+  constructor(games: GameModule[], getVersionName: (gameId: GameId) => string | null, getIconUrl: (gameId: GameId, name: string) => string | null) {
     this.#games = games.filter(game => game.wishHistory);
     this.#getVersionName = getVersionName;
+    this.#getIconUrl = getIconUrl;
   }
 
   /** Reconoce el juego y guarda la `authkey`. Lanza si el enlace no sirve. La descarga va aparte (`importWishes`). */
@@ -75,7 +77,7 @@ export class WishHistoryService {
       isImporting: this.#importingGameIds.has(game.id),
       hasValidLink: this.#authkeys.has(game.id),
       error,
-      summary: updatedAt ? { updatedAt, updatedVersion: updatedVersion ?? null, totalPulls: records.length, banners: summarizeWishBanners(records, game.wishHistory, version) } : undefined,
+      summary: updatedAt ? { updatedAt, updatedVersion: updatedVersion ?? null, totalPulls: records.length, banners: summarizeWishBanners(records, game.wishHistory, version, name => this.#getIconUrl(game.id, name)) } : undefined,
     };
   }
 }

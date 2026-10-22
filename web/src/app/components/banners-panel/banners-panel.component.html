@@ -1,0 +1,24 @@
+@if (bannerViews().length) {
+  <div class="banners">
+    <h3>Banners</h3>
+    <ul>
+      @for (banner of bannerViews(); track banner.kind + banner.startsAt) {
+        <li [class.pronto]="banner.isEndingSoon">
+          <span class="banner-nombre">
+            {{ banner.featured.join(' y ') || banner.kindLabel }}
+            <span class="banner-tipo">{{ banner.kindLabel }}</span>
+          </span>
+          <span class="banner-quedan">{{ banner.daysLeftText }}</span>
+          <div
+            class="barra"
+            aria-hidden="true">
+            <span
+              class="barra-relleno"
+              [style.width.%]="banner.elapsedPercent"></span>
+          </div>
+          <span class="banner-fin">Hasta el {{ banner.endsAt | date: 'd MMM, H:mm' }}</span>
+        </li>
+      }
+    </ul>
+  </div>
+}

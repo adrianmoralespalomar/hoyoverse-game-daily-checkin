@@ -46,6 +46,7 @@ export class TodayHeroComponent {
       gameId: game.id,
       shortName: theme.shortName,
       accent: theme.accent,
+      logoUrl: theme.logoUrl,
       reward: getTodayReward(game),
       isDone: checkIn.isDoneToday,
       needsYou,

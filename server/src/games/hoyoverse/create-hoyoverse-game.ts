@@ -1,7 +1,9 @@
 import type { GameModule } from '../../models/game-module.interface.ts';
 import type { HoyoverseGameConfig } from '../../models/hoyoverse-game-config.interface.ts';
 import type { HoyoverseGameSettings } from '../../models/hoyoverse-game-settings.interface.ts';
+import { WISH_NAMES_LANGUAGE } from '../../models/wish-names-language.const.ts';
 import { STANDARD_CHARACTERS } from '../../models/standard-characters.const.ts';
+import { fetchCharacterIcons } from './character-icons.ts';
 import { fetchNewWishes, isGachaLinkOfGame } from './gacha-log.ts';
 import { createGameRecordClient } from './game-record-client.ts';
 import { fetchAvailableCodes } from './hoyo-codes-client.ts';
@@ -35,6 +37,7 @@ export function createHoyoverseGame(game: HoyoverseGameConfig, settings: Hoyover
   if (checkInCookie && uid) {
     const recordClient = createGameRecordClient(game, { ...checkInOptions, uid });
     gameModule.fetchNotes = () => fetchRealtimeNotes(game, { ...checkInOptions, uid });
+    gameModule.fetchCharacterIcons = () => fetchCharacterIcons(game.id, createGameRecordClient(game, { cookie: checkInCookie, language: WISH_NAMES_LANGUAGE, uid }));
     gameModule.fetchProgress = () => GAME_PROGRESS_FETCHERS[game.id](recordClient, game.currencyItemId, Date.now());
   } else gameModule.notesDisabledReason = !checkInCookie ? 'Falta la cookie de HoYoLAB en el .env' : `Falta ${game.uidEnvVariable} en el .env`;
   if (checkInCookie && redeemCookie && uid) {

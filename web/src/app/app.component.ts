@@ -1,4 +1,5 @@
 import { Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
+import { AlertToastsComponent } from './components/alert-toasts/alert-toasts.component';
 import { ControlPanelComponent } from './components/control-panel/control-panel.component';
 import { GameChapterComponent } from './components/game-chapter/game-chapter.component';
 import { LoginFormComponent } from './components/login-form/login-form.component';
@@ -9,7 +10,7 @@ import { HoyoGamesApiService } from './services/hoyo-games-api.service';
 
 /** Una sola página: los sellos de hoy, un capítulo por juego y el panel de control. */
 @Component({
-  imports: [ControlPanelComponent, GameChapterComponent, LoginFormComponent, TodayHeroComponent],
+  imports: [AlertToastsComponent, ControlPanelComponent, GameChapterComponent, LoginFormComponent, TodayHeroComponent],
   selector: 'app-root',
   styleUrl: './app.component.scss',
   templateUrl: './app.component.html',

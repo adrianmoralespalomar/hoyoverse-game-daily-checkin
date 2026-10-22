@@ -32,6 +32,8 @@ export interface GameModule {
   fetchIncomeMonth?: (month: string) => Promise<IncomeEntry[]>;
   /** Por qué no hay diario, si `fetchIncomeMonth` no está. */
   incomeDisabledReason?: string;
+  /** Nombre del personaje en minúsculas → URL de su icono, con los nombres en el idioma del historial de tiradas. Lanza si HoYoLAB no lo da. */
+  fetchCharacterIcons?: () => Promise<Record<string, string>>;
   /** Historial de tiradas con el enlace del juego (no usa cookies). */
   wishHistory?: WishHistoryCapability;
 }

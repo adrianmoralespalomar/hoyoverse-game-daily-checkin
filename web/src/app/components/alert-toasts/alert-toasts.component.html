@@ -1,0 +1,31 @@
+<ul
+  class="avisos"
+  aria-label="Avisos">
+  @for (alert of visibleAlerts(); track alert.id) {
+    <li
+      [attr.data-gravedad]="alert.severity"
+      [attr.role]="alert.severity === 'error' ? 'alert' : 'status'"
+      [style.--color-aviso]="alert.accent">
+      @if (alert.logoUrl) {
+        <img
+          class="aviso-logo"
+          alt=""
+          width="40"
+          height="40"
+          [src]="alert.logoUrl"/>
+      }
+      <span class="aviso-titulo">{{ alert.titleText }}</span>
+      <span class="aviso-mensaje">{{ alert.message }}</span>
+      @if (alert.href) {
+        <a
+          class="aviso-enlace"
+          [href]="alert.href">Ir a la sección</a>
+      }
+      <button
+        type="button"
+        class="aviso-cerrar"
+        aria-label="Cerrar aviso"
+        (click)="onDismissButtonClicked(alert.id)">×</button>
+    </li>
+  }
+</ul>

@@ -5,10 +5,14 @@
  */
 export const SCHEDULE = {
   defaultCheckInTime: '19:00',
+  /** Hora a la que te despiertas, para avisar de la energía que se pierde mientras duermes. Se cambia desde el panel. */
+  defaultWakeUpTime: '07:00',
   /** Cada hora: reintenta el check-in si falló por la red y busca códigos nuevos. */
   hourlyCron: '17 * * * *',
   /** Resina y energía: solo lectura, cada 20 minutos (entre medias, el panel estima la recarga). */
   notesCron: '*/20 * * * *',
+  /** Mira si hay avisos nuevos que mandar al móvil como notificación. */
+  alertPushCron: '*/10 * * * *',
   /** Calendario, contenido final y diario: solo lectura, cada 2 horas (cambian poco). */
   progressCron: '41 */2 * * *',
   /** Hojas de la comunidad con las tiradas F2P: cambian como mucho al empezar una versión. */

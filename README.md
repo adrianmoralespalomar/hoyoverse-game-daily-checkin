@@ -51,7 +51,22 @@ Hacen falta dos: una de **hoyolab.com** (check-in) y otra de **hoyoverse.com** (
 
 Para actualizar el código más adelante basta con `npm run deploy`: el contenedor se reinicia solo. Si cambian las dependencias, el `Dockerfile` o el `docker-compose.yaml` (el comando avisa), hay que **reconstruir**: en UGOS, borrar el proyecto y su imagen y volver a crearlo desde la misma carpeta.
 
-**Desde fuera de casa:** el Tailscale del NAS solo publica el asistente. Para entrar aquí también, habría que añadir el puerto 4330 al `serve.json` del proyecto `tailscale` (repo `asistente`, carpeta `deploy/tailscale/`).
+**Desde fuera de casa y como app:** el Tailscale del NAS publica el asistente por HTTPS en el puerto 443. Para entrar aquí también (y poder instalar el panel como app en el móvil, que Chrome solo permite por HTTPS), añade el puerto 8443 al `serve.json` del proyecto `tailscale` (repo `asistente`, `deploy/tailscale/`, y su copia en `\ChanoNASProgramas	ailscale`):
+
+```json
+{
+  "TCP": {
+    "443": { "HTTPS": true },
+    "8443": { "HTTPS": true }
+  },
+  "Web": {
+    "${TS_CERT_DOMAIN}:443": { "Handlers": { "/": { "Proxy": "http://127.0.0.1:4321" } } },
+    "${TS_CERT_DOMAIN}:8443": { "Handlers": { "/": { "Proxy": "http://127.0.0.1:4330" } } }
+  }
+}
+```
+
+Reinicia el contenedor `tailscale` en UGOS y abre `https://chanonas.<tu-red>.ts.net:8443`: Chrome ofrece "Instalar aplicación". El panel ya trae manifiesto, iconos (`scripts/generate-pwa-icons.ts` los dibuja a partir de `favicon.svg`) y un service worker mínimo. No se usa el 4330 en Tailscale porque Docker ya lo tiene ocupado en el NAS.
 
 ## 3. Qué significa cada estado
 
@@ -80,10 +95,10 @@ Para actualizar el código más adelante basta con `npm run deploy`: el contened
 
 **Diario de ingresos**: necesita las dos cookies del `.env` (Star Rail no lo da solo con la de HoYoLAB).
 
-**Historial de tiradas**: abre el juego en el PC, entra en el historial de tiradas y, desde la carpeta del repo, ejecuta (con `gi`, `hsr` o `zzz`):
+**Historial de tiradas**: abre el juego en el PC, entra en el historial de tiradas y ejecuta en PowerShell, desde cualquier carpeta (con `gi`, `hsr` o `zzz`):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts\get-wish-link.ps1 -Game gi
+powershell -ExecutionPolicy Bypass -File C:/Users/Adrian/Documents/repos/Personal/hoyoverse-game-daily-checkin/scripts/get-wish-link.ps1 -Game gi
 ```
 
 Copia el enlace de la caché del juego al portapapeles; pégalo en la sección Tiradas del juego. El enlace solo da acceso al historial, no a la cuenta, y el NAS no lo guarda en disco. Si en el gachapón estándar entra un 5★ nuevo, añádelo a `server/src/models/standard-characters.const.ts` para que el 50/50 se cuente bien.

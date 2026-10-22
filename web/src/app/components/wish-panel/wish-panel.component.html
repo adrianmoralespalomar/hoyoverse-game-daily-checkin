@@ -25,19 +25,34 @@
             }
             {{ banner.pullsThisVersion }} tiradas esta versión, {{ banner.totalPulls }} en total.
           </span>
-          @if (banner.lastTopPulls.length) {
+          @if (banner.fiftyFifty; as fiftyFifty) {
+            @if (isHistoryOpen()) {
+              <span class="gachapon-detalle">
+                50/50: {{ fiftyFifty.won }} ganados y {{ fiftyFifty.lost }} perdidos.
+              </span>
+            }
+          }
+          @if (banner.shownTopPulls.length) {
             <ol
               class="ultimos"
               [attr.aria-label]="'Últimos ' + theme().topRankLabel">
-              @for (pull of banner.lastTopPulls; track pull.at + pull.name) {
+              @for (pull of banner.shownTopPulls; track pull.at + pull.name) {
                 <li
-                  [class.perdido]="pull.wonFiftyFifty === false"
-                  [attr.title]="pull.at | date: 'd MMM y'">
-                  {{ pull.name }}
-                  <span class="ultimo-pity">{{ pull.pity }}</span>
-                  @if (pull.wonFiftyFifty === false) {
-                    <span class="ultimo-nota">50/50 perdido</span>
-                  }
+                  [attr.data-resultado]="pull.result"
+                  [attr.title]="pull.name + ': ' + (pull.at | date: 'd MMM y') + (pull.note ? '. ' + pull.note : '')">
+                  <span class="ultimo-circulo">
+                    @if (pull.iconUrl; as iconUrl) {
+                      <img
+                        alt=""
+                        referrerpolicy="no-referrer"
+                        [src]="iconUrl"
+                        (error)="onTopPullIconFailed(iconUrl)"/>
+                    } @else {
+                      {{ pull.initials }}
+                    }
+                    <span class="ultimo-pity">{{ pull.pityLabel }}</span>
+                  </span>
+                  <span class="ultimo-nombre">{{ pull.name }}</span>
                 </li>
               }
             </ol>
@@ -45,6 +60,14 @@
         </li>
       }
     </ul>
+  }
+
+  @if (hasLongHistory()) {
+    <button
+      type="button"
+      class="boton secundario"
+      [attr.aria-expanded]="isHistoryOpen()"
+      (click)="onHistoryButtonClicked()">{{ isHistoryOpen() ? 'Ocultar historial' : 'Ver historial' }}</button>
   }
 
   @if (wishesState().summary; as summary) {
@@ -101,8 +124,13 @@
     <ol>
       <li>En el PC donde juegas, abre el juego y entra en el historial de tiradas.</li>
       <li>
-        En PowerShell, desde la carpeta del repo:
-        <code>{{ scriptCommand() }}</code>
+        Abre PowerShell (vale desde cualquier carpeta) y ejecuta:
+        <div class="como-comando">
+          <code>{{ scriptCommand() }}</code>
+          <button
+            type="button"
+            (click)="onCopyCommandButtonClicked()">{{ commandCopyLabels[commandCopyState()] }}</button>
+        </div>
       </li>
       <li>El enlace queda copiado: pégalo arriba. Dura 24 horas y no da acceso a tu cuenta, solo al historial.</li>
     </ol>

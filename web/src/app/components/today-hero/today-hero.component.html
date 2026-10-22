@@ -11,7 +11,14 @@
         [class.te-necesita]="stamp.needsYou"
         [style.--acento]="stamp.accent"
         [style.--orden]="$index">
-        <span class="sello-juego">{{ stamp.shortName }}</span>
+        <span class="sello-juego">
+          <img
+            alt=""
+            width="28"
+            height="28"
+            [src]="stamp.logoUrl"/>
+          {{ stamp.shortName }}
+        </span>
         @if (stamp.reward) {
           <img
             [src]="stamp.reward.iconUrl"

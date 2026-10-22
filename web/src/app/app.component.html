@@ -9,7 +9,14 @@
       @for (game of dashboard()?.games; track game.id) {
         <a
           [href]="'#' + game.id"
-          [style.--acento]="gameThemes[game.id].accent">{{ gameThemes[game.id].shortName }}</a>
+          [style.--acento]="gameThemes[game.id].accent">
+          <img
+            alt=""
+            width="20"
+            height="20"
+            [src]="gameThemes[game.id].logoUrl"/>
+          {{ gameThemes[game.id].shortName }}
+        </a>
       }
     </nav>
     <a
@@ -43,4 +50,8 @@
       <span class="cargando">Leyendo el NAS…</span>
     }
   </main>
+
+  @if (dashboard(); as dashboard) {
+    <app-alert-toasts [alerts]="dashboard.alerts"/>
+  }
 }

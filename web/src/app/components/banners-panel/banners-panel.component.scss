@@ -1,0 +1,67 @@
+.banners {
+  display: grid;
+  gap: 1rem;
+
+  h3 {
+    font-size: 1.8rem;
+    font-variation-settings: 'opsz' 72, 'wdth' 85;
+  }
+
+  ul {
+    display: grid;
+    gap: 1.1rem 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      align-content: start;
+      display: grid;
+      gap: 0.35rem;
+      grid-template-columns: 1fr auto;
+
+      span.banner-nombre {
+        font-weight: 600;
+
+        span.banner-tipo {
+          color: var(--apagado);
+          display: block;
+          font-size: 0.85rem;
+          font-weight: 400;
+        }
+      }
+
+      span.banner-quedan {
+        color: var(--apagado);
+        white-space: nowrap;
+      }
+
+      .barra {
+        background: var(--superficie-alta);
+        border-radius: 999px;
+        grid-column: 1 / -1;
+        height: 0.45rem;
+        overflow: hidden;
+
+        span.barra-relleno {
+          background: var(--acento);
+          border-radius: inherit;
+          display: block;
+          height: 100%;
+        }
+      }
+
+      span.banner-fin {
+        color: var(--apagado);
+        font-size: 0.85rem;
+        grid-column: 1 / -1;
+      }
+
+      &.pronto span.banner-quedan {
+        color: var(--acento);
+        font-weight: 650;
+      }
+    }
+  }
+}

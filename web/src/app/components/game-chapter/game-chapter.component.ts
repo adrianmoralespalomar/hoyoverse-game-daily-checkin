@@ -2,22 +2,24 @@ import { DatePipe } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
 import type { CalendarDay } from '../../models/calendar-day.interface';
 import { CHECK_IN_STATUS_LABELS } from '../../models/check-in-status-labels.const';
+import { INACTIVE_CODES_VISIBLE_DAYS } from '../../models/inactive-codes-visible-days.const';
 import { CODE_STATUS_LABELS } from '../../models/code-status-labels.const';
 import type { GameDashboard } from '../../models/game-dashboard.interface';
 import { GAME_THEMES } from '../../models/game-themes.const';
-import { VISIBLE_INACTIVE_CODES_LIMIT } from '../../models/visible-inactive-codes-limit.const';
+
 import { getTodayRewardIndex } from '../../utils/today-reward';
+import { BannersPanelComponent } from '../banners-panel/banners-panel.component';
 import { EndgamePanelComponent } from '../endgame-panel/endgame-panel.component';
 import { EnergyPanelComponent } from '../energy-panel/energy-panel.component';
 import { IncomePanelComponent } from '../income-panel/income-panel.component';
 import { WishPanelComponent } from '../wish-panel/wish-panel.component';
 
 /**
- * Un capítulo por juego: su energía, contenido final, ingresos de la versión, tiradas, el calendario del mes (se va
+ * Un capítulo por juego: su energía, contenido final, banners, ingresos de la versión, tiradas, el calendario del mes (se va
  * sellando al hacer scroll) y sus códigos.
  */
 @Component({
-  imports: [DatePipe, EndgamePanelComponent, EnergyPanelComponent, IncomePanelComponent, WishPanelComponent],
+  imports: [BannersPanelComponent, DatePipe, EndgamePanelComponent, EnergyPanelComponent, IncomePanelComponent, WishPanelComponent],
   selector: 'app-game-chapter',
   styleUrl: './game-chapter.component.scss',
   templateUrl: './game-chapter.component.html',
@@ -28,6 +30,7 @@ export class GameChapterComponent {
 
   protected readonly codeStatusLabels = CODE_STATUS_LABELS;
   protected readonly theme = computed(() => GAME_THEMES[this.game().id]);
+  protected readonly banners = computed(() => this.game().progress?.progress?.banners ?? []);
   protected readonly pendingEventsCurrency = computed(() => (this.game().progress?.progress?.pendingEvents ?? []).reduce((total, event) => total + event.currency, 0));
   protected readonly versionName = computed(() => this.game().progress?.progress?.version?.name ?? null);
   protected readonly summary = computed(() => this.game().checkIn?.summary ?? null);
@@ -49,7 +52,8 @@ export class GameChapterComponent {
   });
   protected readonly codes = computed(() => {
     const allCodes = this.game().codes?.codes ?? [];
-    const visibleCodes = [...allCodes.filter(code => code.isActive), ...allCodes.filter(code => !code.isActive).slice(0, VISIBLE_INACTIVE_CODES_LIMIT)];
+    const oldestVisibleMs = Date.now() - INACTIVE_CODES_VISIBLE_DAYS * 24 * 60 * 60 * 1000;
+    const visibleCodes = allCodes.filter(code => code.isActive || Date.parse(code.firstSeenAt) >= oldestVisibleMs);
     // La fuente da las recompensas como "Primogem*60;Mora*20000"
     return visibleCodes.map(code => ({ ...code, rewards: code.rewards.replaceAll('*', ' ×').replaceAll(';', ', ') }));
   });

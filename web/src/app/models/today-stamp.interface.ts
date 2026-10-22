@@ -6,6 +6,7 @@ export interface TodayStamp {
   gameId: GameId;
   shortName: string;
   accent: string;
+  logoUrl: string;
   reward: CheckInReward | null;
   isDone: boolean;
   /** Algo que solo puedes arreglar tú (captcha, cookie caducada). */

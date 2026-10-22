@@ -4,7 +4,9 @@ import { COOKIE_DESCRIPTIONS } from '../../models/cookie-descriptions.const';
 import { COOKIE_HEALTH_LABELS } from '../../models/cookie-health-labels.const';
 import type { CookieKind } from '../../models/cookie-kind.type';
 import type { Dashboard } from '../../models/dashboard.interface';
+import { AlertToastService } from '../../services/alert-toast.service';
 import { HoyoGamesApiService } from '../../services/hoyo-games-api.service';
+import { PushNotificationService } from '../../services/push-notification.service';
 import { CookieGuideComponent } from '../cookie-guide/cookie-guide.component';
 
 /** Hora del check-in, estado de las cookies, cómo renovarlas y botones para no esperar a la próxima ronda. */
@@ -15,13 +17,18 @@ import { CookieGuideComponent } from '../cookie-guide/cookie-guide.component';
   templateUrl: './control-panel.component.html',
 })
 export class ControlPanelComponent {
+  private readonly alertToastService = inject(AlertToastService);
   private readonly hoyoGamesApi = inject(HoyoGamesApiService);
+
+  protected readonly pushNotificationService = inject(PushNotificationService);
 
   readonly dashboard = input.required<Dashboard>();
 
   protected readonly actionError = signal<string | null>(null);
   /** Lo que hay escrito en el campo de hora. Vuelve a la hora guardada cuando cambia en el NAS. */
   protected readonly checkInTimeDraft = linkedSignal(() => this.dashboard().checkInTimeLabel);
+  /** Igual que la hora del check-in, para la hora de despertarte. */
+  protected readonly wakeUpTimeDraft = linkedSignal(() => this.dashboard().wakeUpTimeLabel);
   protected readonly cookieHealthLabels = COOKIE_HEALTH_LABELS;
   protected readonly cookies = computed(() => (Object.keys(COOKIE_DESCRIPTIONS) as CookieKind[]).map(kind => ({
     kind,
@@ -46,6 +53,34 @@ export class ControlPanelComponent {
 
   protected onCheckInTimeChanged(event: Event): void {
     this.checkInTimeDraft.set((event.target as HTMLInputElement).value);
+  }
+
+  protected onWakeUpTimeChanged(event: Event): void {
+    this.wakeUpTimeDraft.set((event.target as HTMLInputElement).value);
+  }
+
+  protected onWakeUpTimeFormSubmitted(): void {
+    this.runAction(() => this.hoyoGamesApi.saveWakeUpTime(this.wakeUpTimeDraft()));
+  }
+
+  protected onAlertRuleChanged(ruleId: string, event: Event): void {
+    this.runAction(() => this.hoyoGamesApi.saveAlertRuleEnabled(ruleId, (event.target as HTMLInputElement).checked));
+  }
+
+  protected onEnablePushButtonClicked(): void {
+    this.pushNotificationService.enable();
+  }
+
+  protected onDisablePushButtonClicked(): void {
+    this.pushNotificationService.disable();
+  }
+
+  protected onTestPushButtonClicked(): void {
+    this.pushNotificationService.sendTest();
+  }
+
+  protected onTestAlertButtonClicked(): void {
+    this.alertToastService.showSampleAlert();
   }
 
   protected onCheckInButtonClicked(): void {
