@@ -1,3 +1,4 @@
+import type { AlertPushNotification } from './alert-push-notification.interface.ts';
 import type { AlertSeverity } from './alert-severity.type.ts';
 import type { GameId } from './game-id.type.ts';
 
@@ -10,6 +11,8 @@ export interface AppAlert {
   severity: AlertSeverity;
   title: string;
   message: string;
+  /** Qué se manda al móvil: lo mismo que el aviso si no se pone, otro texto si se pone, y nada si es `null`. */
+  pushNotification?: AlertPushNotification | null;
   /** Ancla del panel a la que lleva el aviso, por ejemplo `#gi`. */
   href?: string;
 }

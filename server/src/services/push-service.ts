@@ -42,14 +42,16 @@ export class PushService {
     await this.#sendToAll({ title: 'Hoyo Games', body: 'Las notificaciones funcionan.', tag: 'test', url: './' });
   }
 
-  /** Manda los avisos que no se habían mandado ya. Los que dejan de estar activos se olvidan, y si vuelven suenan otra vez. */
+  /** Manda los avisos que no se habían mandado ya (salvo los que no van al móvil). Los que dejan de estar activos se olvidan, y si vuelven suenan otra vez. */
   async notifyNewAlerts(alerts: AppAlert[]): Promise<void> {
-    const freshAlerts = alerts.filter(({ id }) => !this.#data.sentAlertIds.includes(id));
-    this.#data.sentAlertIds = alerts.map(({ id }) => id);
+    const pushableAlerts = alerts.filter(({ pushNotification }) => pushNotification !== null);
+    const freshAlerts = pushableAlerts.filter(({ id }) => !this.#data.sentAlertIds.includes(id));
+    this.#data.sentAlertIds = pushableAlerts.map(({ id }) => id);
     this.#save();
     for (const alert of freshAlerts) {
+      const { title, body } = alert.pushNotification ?? { title: alert.title, body: alert.message };
       const gameName = alert.gameId && this.#gameNames[alert.gameId];
-      await this.#sendToAll({ title: gameName ? `${gameName}: ${alert.title}` : alert.title, body: alert.message, tag: alert.id, url: `./${alert.href ?? ''}` });
+      await this.#sendToAll({ title: gameName ? `${gameName}: ${title}` : title, body, tag: alert.id, url: `./${alert.href ?? ''}` });
     }
   }
 
